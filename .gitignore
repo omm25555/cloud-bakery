@@ -1,0 +1,17 @@
+# Roblox place files (source of truth is this repo, synced via Rojo)
+*.rbxl
+*.rbxlx
+*.rbxl.lock
+*.rbxlx.lock
+
+# Rojo build output
+/build/
+
+# OS files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Editors
+.vscode/
+.idea/
