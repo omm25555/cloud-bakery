@@ -20,7 +20,9 @@ for _, child in Controllers:GetChildren() do
 	local controller = result :: Controller
 	local startFn = controller.Start
 	if startFn then
-		local startOk, startErr = pcall(startFn)
+		local startOk, startErr = pcall(function()
+			startFn()
+		end)
 		if not startOk then
 			warn(`[Client] {child.Name}.Start ล้มเหลว: {startErr}`)
 			continue
