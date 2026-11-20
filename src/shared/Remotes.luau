@@ -51,6 +51,7 @@ end
 -- Server only: create every declared remote up front.
 function Remotes.init()
 	assert(RunService:IsServer(), "[Remotes] init() is server-only")
+	getFolder() -- always create the folder so clients can wait on it
 	for _, name in EVENTS do
 		getOrCreate(name, "RemoteEvent")
 	end
