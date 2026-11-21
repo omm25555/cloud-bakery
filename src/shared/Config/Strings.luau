@@ -34,6 +34,14 @@ local Messages: { [string]: Entry } = {
 		th = "โหลดข้อมูลไม่สำเร็จ ข้อมูลของคุณปลอดภัย กรุณาเข้าเกมใหม่อีกครั้ง",
 		en = "Couldn't load your data. Your data is safe. Please rejoin the game.",
 	},
+	KickDataLocked = {
+		th = "ข้อมูลของคุณยังถูกใช้งานอยู่ในเซิร์ฟเวอร์อื่น ข้อมูลปลอดภัย กรุณารอสักครู่แล้วเข้าเกมใหม่",
+		en = "Your data is still in use on another server. Your data is safe. Please wait a moment and rejoin.",
+	},
+	KickLockLost = {
+		th = "ข้อมูลของคุณถูกเซิร์ฟเวอร์อื่นเข้าใช้งานแล้ว ระบบหยุดบันทึกเพื่อไม่ให้ข้อมูลทับกัน ข้อมูลปลอดภัย กรุณาเข้าเกมใหม่",
+		en = "Your data was taken over by another server. Saving was stopped to avoid overwriting. Your data is safe. Please rejoin.",
+	},
 	KickDataNewer = {
 		th = "ข้อมูลของคุณถูกบันทึกด้วยเกมเวอร์ชันที่ใหม่กว่าเซิร์ฟเวอร์นี้ ข้อมูลปลอดภัย กรุณาเข้าเกมใหม่",
 		en = "Your data was saved by a newer game version than this server. Your data is safe. Please rejoin.",
@@ -59,10 +67,10 @@ function Strings.Format(key: string, language: string, args: { [string]: string 
 	if args == nil then
 		return text
 	end
-	local result = string.gsub(text, "{(%w+)}", function(name: string): string?
+	local result = string.gsub(text, "{(%w+)}", function(name: string): string
 		local value = args[name]
 		if value == nil then
-			return nil
+			return "{" .. name .. "}"
 		end
 		return tostring(value)
 	end)

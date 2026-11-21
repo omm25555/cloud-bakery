@@ -28,7 +28,9 @@ local languageProvider: (Player) -> string = function(_player: Player): string
 	return PlayerDataConfig.DefaultLanguage
 end
 
-local limiter = RateLimiter.new(RateLimits)
+local limiter = RateLimiter.new(RateLimits, function(player: Player, _remoteName: string)
+	NotifyService.NotifyRateLimited(player)
+end)
 
 -- DataService ตั้งให้ เพื่อให้ NotifyService ไม่ต้อง require DataService (กันพึ่งกันเป็นวง)
 function NotifyService.SetLanguageProvider(provider: (Player) -> string)
@@ -83,18 +85,18 @@ local function deliver(player: Player, payload: Payload)
 	end
 end
 
-function NotifyService.Notify(player: Player, key: string, kind: string, args: { [string]: string | number }?)
+function NotifyService.Notify(player: Player, key: string, kind: NotifyConfig.Kind, args: { [string]: string | number }?)
 	if player.Parent ~= Players then
 		return
 	end
 	local safeKey = key
-	local safeKind = kind
+	local safeKind: NotifyConfig.Kind = kind
 	if type(key) ~= "string" or not Strings.Has(key) then
 		warn(`[NotifyService] ไม่พบ key ข้อความ "{tostring(key)}" (ผู้เล่น {player.Name}) ใช้ข้อความกลางแทน`)
 		safeKey = "UnknownError"
 		safeKind = "error"
 	end
-	if not NotifyConfig.Kinds[safeKind] then
+	if NotifyConfig.Kinds[safeKind] ~= true then
 		warn(`[NotifyService] kind "{tostring(kind)}" ไม่ถูกต้อง (ผู้เล่น {player.Name}) ใช้ info แทน`)
 		safeKind = "info"
 	end

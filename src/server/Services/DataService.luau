@@ -27,6 +27,7 @@ type Session = {
 	Left: boolean,
 	Saving: boolean,
 	Finalizing: boolean,
+	LockLost: boolean,
 	FailReason: FailReason,
 	AutosaveThread: thread?,
 }
@@ -45,7 +46,8 @@ local sessionId: string = if game.JobId ~= "" then game.JobId else HttpService:G
 local DataService = {}
 
 local loadedEvent = Instance.new("BindableEvent")
--- ยิงเมื่อข้อมูลผู้เล่นพร้อมใช้: (player: Player, data: PlayerData)
+-- ยิงเมื่อข้อมูลผู้เล่นพร้อมใช้: (player: Player) ส่งแค่ player เพราะ BindableEvent copy table
+-- ผู้ฟังต้องเรียก DataService.GetData(player) เพื่อได้ table จริงที่ถูกเซฟ
 DataService.Loaded = loadedEvent.Event
 
 local sessions: { [Player]: Session } = {}
@@ -166,22 +168,6 @@ local function sanitize(raw: { [string]: any }, playerName: string): PlayerData
 	return data
 end
 
-local function getStore(): DataStore?
-	if dataStore then
-		return dataStore
-	end
-	local holder: { Store: DataStore? } = { Store = nil }
-	local ok, err = pcall(function()
-		holder.Store = DataStoreService:GetDataStore(cfg.DataStoreName)
-	end)
-	if not ok then
-		warn(`{LOG} เรียก DataStore ไม่สำเร็จ: {err}`)
-		return nil
-	end
-	dataStore = holder.Store
-	return dataStore
-end
-
 local function isStudioApiDisabled(err: string): boolean
 	if not RunService:IsStudio() then
 		return false
@@ -201,6 +187,27 @@ local function enterTemporaryMode()
 	end
 	temporaryMode = true
 	warn(`{LOG} Studio ไม่ได้เปิด API Services เข้าโหมดชั่วคราว: ใช้ข้อมูลในหน่วยความจำและจะไม่บันทึก`)
+end
+
+-- ถ้า GetDataStore throw และเป็น error ของ Studio (ไม่เปิด API/ยังไม่ publish) เข้าโหมดชั่วคราว
+local function getStore(): DataStore?
+	if dataStore then
+		return dataStore
+	end
+	local holder: { Store: DataStore? } = { Store = nil }
+	local ok, err = pcall(function()
+		holder.Store = DataStoreService:GetDataStore(cfg.DataStoreName)
+	end)
+	if not ok then
+		local message = tostring(err)
+		warn(`{LOG} เรียก DataStore ไม่สำเร็จ: {message}`)
+		if isStudioApiDisabled(message) then
+			enterTemporaryMode()
+		end
+		return nil
+	end
+	dataStore = holder.Store
+	return dataStore
 end
 
 -- ลองซ้ำแบบ backoff คืนผลสุดท้าย (ผู้เรียกเป็นคนตัดสินใจว่าจะ log error/kick ต่อ)
@@ -245,6 +252,9 @@ end
 local function attemptLoad(session: Session): (Outcome, string?)
 	local store = getStore()
 	if store == nil then
+		if temporaryMode then
+			return "Fatal", "Studio ไม่เปิด API Services"
+		end
 		return "Retry", "DataStore ยังไม่พร้อม"
 	end
 	local player = session.Player
@@ -295,11 +305,12 @@ local function attemptLoad(session: Session): (Outcome, string?)
 
 	if not ok then
 		local message = tostring(err)
+		session.FailReason = "Error"
 		if isStudioApiDisabled(message) then
 			enterTemporaryMode()
+			return "Fatal", message
 		end
-		session.FailReason = "Error"
-		return "Fatal", message
+		return "Retry", message
 	end
 
 	local reason = state.Reason
@@ -359,6 +370,7 @@ local function attemptSave(session: Session, release: boolean): (Outcome, string
 		return "Retry", tostring(err)
 	end
 	if state.Lost then
+		session.LockLost = true
 		return "Fatal", "lock ไม่ตรงกับเซิร์ฟเวอร์นี้ ยกเลิกการเขียนเพื่อไม่ทับข้อมูลของเซิร์ฟเวอร์อื่น"
 	end
 	if release then
@@ -423,6 +435,15 @@ local function saveSession(session: Session, release: boolean, retryCfg: RetryCo
 	if outcome == "Ok" then
 		return true
 	end
+	if session.LockLost then
+		-- lock ถูกเซิร์ฟเวอร์อื่นเอาไป: หยุด autosave (State ไม่ใช่ Active แล้ว) และ kick ถ้ายังอยู่ในเกม
+		session.State = "Failed"
+		logError(`{LOG} lock ของ {player.Name} ถูกเซิร์ฟเวอร์อื่นเอาไป หยุดบันทึกของ session นี้เพื่อไม่ทับข้อมูล: {tostring(message)}`)
+		if not release and player.Parent == Players then
+			player:Kick(Strings.Bilingual("KickLockLost"))
+		end
+		return false
+	end
 	logError(`{LOG} บันทึกข้อมูล {player.Name} ล้มเหลวถาวร: {tostring(message)}`)
 	NotifyService.Notify(player, "SaveFailed", "error")
 	return false
@@ -468,7 +489,7 @@ local function activateTemporary(session: Session)
 	session.Temporary = true
 	session.State = "Active"
 	NotifyService.Notify(session.Player, "TemporaryMode", "error")
-	loadedEvent:Fire(session.Player, session.Data)
+	loadedEvent:Fire(session.Player)
 end
 
 local function kickFor(session: Session)
@@ -477,6 +498,8 @@ local function kickFor(session: Session)
 		messageKey = "KickDataNewer"
 	elseif session.FailReason == "Corrupt" then
 		messageKey = "KickDataCorrupt"
+	elseif session.FailReason == "Locked" then
+		messageKey = "KickDataLocked"
 	end
 	if session.Player.Parent == Players then
 		session.Player:Kick(Strings.Bilingual(messageKey))
@@ -512,7 +535,7 @@ local function loadSession(session: Session)
 		session.State = "Active"
 		startAutosave(session)
 		NotifyService.Notify(player, "DataLoaded", "success")
-		loadedEvent:Fire(player, session.Data)
+		loadedEvent:Fire(player)
 	else
 		session.State = "Failed"
 		logError(`{LOG} โหลดข้อมูล {player.Name} ไม่สำเร็จ ({session.FailReason}) kick ผู้เล่นและไม่เขียนทับข้อมูลเดิม: {tostring(message)}`)
@@ -551,6 +574,7 @@ local function onPlayerAdded(player: Player)
 		Left = false,
 		Saving = false,
 		Finalizing = false,
+		LockLost = false,
 		FailReason = "Error",
 		AutosaveThread = nil,
 	}

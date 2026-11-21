@@ -5,7 +5,7 @@ export type Kind = "info" | "success" | "error"
 
 export type Payload = {
 	Key: string,
-	Kind: string,
+	Kind: Kind,
 	Language: string,
 	Args: { [string]: string | number }?,
 }

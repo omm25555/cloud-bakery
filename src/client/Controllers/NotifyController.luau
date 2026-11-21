@@ -146,12 +146,13 @@ local function onNotify(payload: any)
 
 	local cleanArgs: { [string]: string | number }? = nil
 	if type(args) == "table" then
-		cleanArgs = {}
+		local collected: { [string]: string | number } = {}
 		for name, value in args do
 			if type(name) == "string" and (type(value) == "string" or type(value) == "number") then
-				cleanArgs[name] = value
+				collected[name] = value
 			end
 		end
+		cleanArgs = collected
 	end
 
 	showToast(Strings.Format(key, language, cleanArgs), kind)

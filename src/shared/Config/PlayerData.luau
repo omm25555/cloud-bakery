@@ -81,5 +81,6 @@ return {
 	StudioApiDisabledMarkers = {
 		"studio access to apis is not allowed",
 		"studioaccesstoapisnotallowed",
+		"must publish this place",
 	},
 }
