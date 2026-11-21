@@ -29,6 +29,12 @@
 
 ตรวจว่า build ผ่าน: `rojo build -o build/CloudBakery.rbxl`
 
+## เล่นเวอร์ชันแรกใน Studio
+1. `rojo build -o build/CloudBakery.rbxl` แล้วเปิดไฟล์นี้ใน Studio (place สะอาด ไม่มี Baseplate ทับเกาะ)
+2. `rojo serve` แล้วกด Rojo > Connect เพื่อแก้โค้ดแบบ live
+3. กด Play: เกาะ ร้าน และลูกค้าจะถูกสร้างจากโค้ด (`WorldService`)
+4. ถ้าต้องการทดสอบการบันทึก ให้ publish place และเปิด Game Settings > Security > Enable Studio Access to API Services (เจ้าของเป็นคนตั้งค่า) ถ้ายังไม่เปิด เกมจะเล่นได้แต่ไม่บันทึก และขึ้นแจ้งเตือนบอกผู้เล่น
+
 ## โครงสร้าง
 | โฟลเดอร์ | ปลายทางใน Studio |
 |---|---|

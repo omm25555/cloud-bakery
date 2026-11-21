@@ -5,13 +5,15 @@
 | เฟส | ชื่อ | เนื้อหา | สถานะ |
 |---|---|---|---|
 | 1 | Foundation | Rojo, โครง repo, CLAUDE.md, RULES, Config เบื้องต้น, Remotes | TASK-001 |
-| 2 | Core Services | PlayerData + DataStore (retry, save on leave/BindToClose), ระบบแจ้งเตือนกลาง, rate limit | - |
-| 3 | Harvest | ปลูก/เก็บข้าวสาลี Star Milk สตรอว์เบอรี เวลาโตตัดสินที่ server, กระเป๋า | - |
-| 4 | Bake | โต๊ะผสม เตาอบ มินิเกมจังหวะ (server ตรวจผล) | - |
-| 5 | Serve | ลูกค้า NPC (Panda, Fox, Bunny) ออเดอร์ การเสิร์ฟ เหรียญ/Reputation | - |
-| 6 | Upgrade | อัปเกรด 3 สาย, UI Upgrade/Recipes/Bag/Settings | - |
-| 7 | HUD & Quest | HUD ตาม concept, Daily Quest, Orders panel, 2 ภาษา | - |
-| 8 | Co-op & Polish | co-op แบบเบา, เสียง/เอฟเฟกต์, ปรับบาลานซ์, ทดสอบ | - |
+| 2 | Core Services | PlayerData + DataStore (retry, save on leave/BindToClose), ระบบแจ้งเตือนกลาง, rate limit | เวอร์ชันแรก (TASK-002) |
+| 3 | Harvest | ปลูก/เก็บข้าวสาลี Star Milk สตรอว์เบอรี เวลาโตตัดสินที่ server, กระเป๋า | เวอร์ชันแรก (TASK-002) |
+| 4 | Bake | โต๊ะผสม เตาอบ มินิเกมจังหวะ (server ตรวจผล) | เวอร์ชันแรก (TASK-002) |
+| 5 | Serve | ลูกค้า NPC (Panda, Fox, Bunny) ออเดอร์ การเสิร์ฟ เหรียญ/Reputation | เวอร์ชันแรก (TASK-002) |
+| 6 | Upgrade | อัปเกรด 3 สาย, UI Upgrade/Recipes/Bag/Settings | เวอร์ชันแรก (TASK-002) |
+| 7 | HUD & Quest | HUD ตาม concept, Daily Quest, Orders panel, 2 ภาษา | เวอร์ชันแรก (TASK-002) |
+| 8 | Co-op & Polish | co-op แบบเบา, เสียง/เอฟเฟกต์, ปรับบาลานซ์, ทดสอบ | บางส่วน: แปลง/ออเดอร์ใช้ร่วมกันแล้ว ยังไม่มีเสียงและยังไม่ปรับบาลานซ์ |
+
+> TASK-002 รวมเฟส 2-7 เป็นเวอร์ชันแรกที่เล่นได้ครบวงจรตามที่เจ้าของขอ ถ้าต้องการแยกเป็นหลาย PR ให้แจ้งในรีวิวได้
 
 ## หลัง MVP (ยังไม่ทำ)
 - สัตว์เลี้ยง: แมวเมฆมีปีก (นมเมฆ), กระต่ายสายหวาน (สตรอว์เบอรี), มังกรขนม (โกโก้), แกะ, นก
