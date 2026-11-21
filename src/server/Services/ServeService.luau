@@ -452,21 +452,28 @@ local function boxesOverlap(a: Box, b: Box, clearance: number): boolean
 end
 
 -- สิ่งที่เคาน์เตอร์/โต๊ะเสิร์ฟ/ช่องยืนต้องไม่ทับ: แปลงฟาร์ม โต๊ะผสม เตาอบ (อ่านจาก Config เท่านั้น ไม่แตะ BakeService)
-local function obstacleBoxes(anchor: Vector3?, useAnchor: boolean): { { Name: string, Box: Box } }
+-- BakeService เลือกตำแหน่งทีละสถานี (อิง SpawnLocation หรือพิกัดสำรอง) จึงใส่ทั้งสองตำแหน่งเป็นสิ่งกีดขวาง
+local function obstacleBoxes(anchor: Vector3?): { { Name: string, Box: Box } }
 	local result: { { Name: string, Box: Box } } = {}
 	for index, plot in Farm.Plots do
 		table.insert(result, { Name = `Plot{index}`, Box = { Center = plot.Position, Size = Farm.PlotSize } })
 	end
-	table.insert(result, { Name = Bake.Mixing.Name, Box = boxOf(Bake.Mixing, anchor, useAnchor) })
+	local bakeSpecs: { Serve.StationSpec } = { Bake.Mixing }
 	for _, oven in Bake.Ovens do
-		table.insert(result, { Name = oven.Name, Box = boxOf(oven, anchor, useAnchor) })
+		table.insert(bakeSpecs, oven)
+	end
+	for _, spec in bakeSpecs do
+		if anchor then
+			table.insert(result, { Name = `{spec.Name} (SpawnLocation)`, Box = boxOf(spec, anchor, true) })
+		end
+		table.insert(result, { Name = `{spec.Name} (Fallback)`, Box = boxOf(spec, anchor, false) })
 	end
 	return result
 end
 
 -- ตรวจทุกสถานีของเรา คืนชื่อสิ่งที่ทับ (nil = ไม่ทับ)
 local function findOverlap(specs: { Serve.StationSpec }, anchor: Vector3?, useAnchor: boolean): string?
-	local obstacles = obstacleBoxes(anchor, useAnchor)
+	local obstacles = obstacleBoxes(anchor)
 	for _, spec in specs do
 		local box = boxOf(spec, anchor, useAnchor)
 		for _, obstacle in obstacles do

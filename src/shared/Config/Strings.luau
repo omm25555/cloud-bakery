@@ -354,9 +354,9 @@ local Messages: { [string]: Entry } = {
 		th = "โต๊ะเสิร์ฟ",
 		en = "Serving table",
 	},
-	UiServePromptObject = {
-		th = "ลูกค้า",
-		en = "Customer",
+	UiServeLoadFailed = {
+		th = "ระบบเสิร์ฟโหลดไม่สำเร็จ ลองเข้าเกมใหม่",
+		en = "Serving failed to load. Please rejoin the game.",
 	},
 	UiServePromptAction = {
 		th = "เสิร์ฟ",

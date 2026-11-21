@@ -129,7 +129,6 @@ return {
 	NameTagHeightPixels = 22,
 	HeartFull = "♥",
 	HeartEmpty = "♡",
-	HeartColor = Color3.fromRGB(235, 90, 120),
 	UrgentColor = Color3.fromRGB(200, 60, 70),
 	UrgentSeconds = 30,
 	Font = Enum.Font.GothamMedium,

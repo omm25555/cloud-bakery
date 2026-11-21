@@ -42,6 +42,7 @@ local views: { [number]: CustomerView } = {}
 local pendingOrders: { [number]: OrderData } = {}
 local seatParts: { [number]: BasePart } = {}
 local stationsReady = false
+local loadFailed = false
 local connections: { RBXScriptConnection } = {}
 local tickConnection: RBXScriptConnection? = nil
 local language: string = PlayerDataConfig.DefaultLanguage
@@ -92,6 +93,10 @@ end
 local function refreshCurrency()
 	local label = currencyLabel
 	if label then
+		if loadFailed then
+			label.Text = Strings.Format("UiServeLoadFailed", language, nil)
+			return
+		end
 		local args: { [string]: string | number } = { coins = coins, reputation = reputation }
 		label.Text = Strings.Format("UiServeCurrency", language, args)
 	end
@@ -192,10 +197,21 @@ end
 
 local function createView(order: OrderData)
 	local folder = customersFolder
-	local seat = seatParts[order.Seat]
+	if views[order.OrderId] ~= nil then
+		return
+	end
+	if folder == nil then
+		warn(`{LOG} สร้างลูกค้าออเดอร์ {order.OrderId} ไม่ได้: ไม่มี folder ServeCustomers`)
+		return
+	end
+	local seat: BasePart? = seatParts[order.Seat]
+	if seat == nil then
+		warn(`{LOG} สร้างลูกค้าออเดอร์ {order.OrderId} ไม่ได้: ไม่พบช่อง {order.Seat}`)
+		return
+	end
 	local customer = CustomersConfig.Customers[order.CustomerId]
-	if folder == nil or seat == nil or customer == nil or views[order.OrderId] ~= nil then
-		warn(`{LOG} สร้างลูกค้าออเดอร์ {order.OrderId} ไม่ได้ (ช่อง {order.Seat} / ลูกค้า {order.CustomerId} ไม่พบ)`)
+	if customer == nil then
+		warn(`{LOG} สร้างลูกค้าออเดอร์ {order.OrderId} ไม่ได้: ไม่รู้จักลูกค้า {order.CustomerId}`)
 		return
 	end
 
@@ -433,6 +449,11 @@ local function watchStations()
 	local folder = Workspace:WaitForChild(Serve.FolderName, Serve.ClientWaitSeconds)
 	if folder == nil then
 		warn(`{LOG} ไม่พบ Workspace.{Serve.FolderName} ไม่สามารถแสดงเคาน์เตอร์/ลูกค้าได้`)
+		local label = currencyLabel
+		if label then
+			label.Text = Strings.Format("UiServeLoadFailed", language, nil)
+		end
+		loadFailed = true
 		return
 	end
 	for _, child in folder:GetChildren() do
