@@ -232,7 +232,7 @@ local function finishMinigame(oven: Oven, run: MinigameRun, timedOut: boolean)
 	if oven.Minigame ~= run or oven.State ~= "Minigame" then
 		return
 	end
-	local grade = BakeRhythm.Grade(run.Judgements)
+	local grade: Judgement = BakeRhythm.Grade(run.Judgements)
 	local amount = Bake.ScoreRewards[grade] or 0
 	oven.Minigame = nil
 	oven.State = "Done"
@@ -246,8 +246,7 @@ local function finishMinigame(oven: Oven, run: MinigameRun, timedOut: boolean)
 		if timedOut then
 			NotifyService.Notify(player, "MinigameTimeout", "info")
 		end
-		local args: { [string]: string | number } = { dish = dishName(player, recipeId), amount = amount }
-		NotifyService.Notify(player, `MinigameGrade{grade}`, if grade == "Miss" then "info" else "success", args)
+		NotifyService.Notify(player, `MinigameGrade{grade}`, if grade == "Miss" then "info" else "success", nil)
 		local data = DataService.GetData(player)
 		if data then
 			tryDeliver(player, data, oven, if timedOut then "BakeTimeout" else "BakeTap")
@@ -341,7 +340,8 @@ local function startMinigame(player: Player, oven: Oven)
 	oven.Minigame = run
 	broadcastOven(oven)
 	minigameEvent:FireClient(player, { OvenId = oven.Id, StartedAt = run.StartedAt, Zones = table.clone(zones) })
-	NotifyService.Notify(player, "MinigameStart", "info", { count = mg.TapCount })
+	local startArgs: { [string]: string | number } = { count = mg.TapCount }
+	NotifyService.Notify(player, "MinigameStart", "info", startArgs)
 
 	task.delay(mg.MaxDurationSeconds + mg.TimeoutGraceSeconds, function()
 		finishMinigame(oven, run, true)
@@ -442,14 +442,14 @@ local function onStart(player: Player, recipeIdRaw: unknown)
 			freeOven = oven
 			break
 		elseif oven.State == "Baking" and oven.ReadyAt ~= nil then
-			local left = math.max(0, (oven.ReadyAt :: number) - now)
-			if soonest == nil or left < soonest then
+			local left = (oven.ReadyAt :: number) - now
+			if left > 0 and (soonest == nil or left < soonest) then
 				soonest = left
 			end
 		end
 	end
 	if freeOven == nil then
-		if soonest ~= nil and soonest > 0 then
+		if soonest ~= nil then
 			local args: { [string]: string | number } = { seconds = math.ceil(soonest) }
 			reject(player, "BakeStart", `เตาไม่ว่างทุกเตา (เตาที่ว่างเร็วสุดอีก {string.format("%.1f", soonest)} วินาที)`, "OvensBusy", args)
 		else
@@ -465,6 +465,7 @@ local function onStart(player: Player, recipeIdRaw: unknown)
 	table.sort(ingredientIds)
 
 	local missingParts: { string } = {}
+	local missingArgs: { { [string]: string | number } } = {}
 	local ingredientTotal = 0
 	for _, id in ingredientIds do
 		local need = recipe.Ingredients[id]
@@ -473,11 +474,15 @@ local function onStart(player: Player, recipeIdRaw: unknown)
 		if have < need then
 			local partArgs: { [string]: string | number } = { name = ingredientName(player, id), count = need - have }
 			table.insert(missingParts, Strings.Format("UiInventoryItem", languageOf(player), partArgs))
+			table.insert(missingArgs, partArgs)
 		end
 	end
 	if #missingParts > 0 then
-		local args: { [string]: string | number } = { missing = table.concat(missingParts, ", ") }
-		reject(player, "BakeStart", `วัตถุดิบไม่พอสำหรับ {recipe.Id}: {table.concat(missingParts, ", ")}`, "BakeMissingIngredients", args)
+		-- แจ้งทีละวัตถุดิบ: arg ยาวเกิน Notify.MaxArgLength จะถูกทิ้ง
+		warn(`{LOG} {player.Name} BakeStart ปฏิเสธ: วัตถุดิบไม่พอสำหรับ {recipe.Id}: {table.concat(missingParts, ", ")}`)
+		for _, partArgs in missingArgs do
+			NotifyService.Notify(player, "BakeMissingIngredients", "error", partArgs)
+		end
 		return
 	end
 
@@ -491,7 +496,11 @@ local function onStart(player: Player, recipeIdRaw: unknown)
 
 	for _, id in ingredientIds do
 		local left = (data.Inventory[id] or 0) - recipe.Ingredients[id]
-		data.Inventory[id] = if left > 0 then left else nil
+		if left > 0 then
+			data.Inventory[id] = left
+		else
+			data.Inventory[id] = nil
+		end
 	end
 	freeOven.State = "Baking"
 	freeOven.RecipeId = recipe.Id

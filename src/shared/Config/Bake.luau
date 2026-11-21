@@ -90,7 +90,7 @@ return {
 		MaxDurationSeconds = 12, -- หมดเวลาแล้ว server สรุปผลเอง (ครั้งที่ไม่ได้กดนับเป็น Miss)
 		TimeoutGraceSeconds = 1,
 		LatencyToleranceSeconds = 0.5, -- เวลาที่ client ส่งมาล้ำหน้าเวลาจริงบน server ได้เท่านี้
-		MaxTapLagSeconds = 2, -- เวลาที่ client ส่งมาช้ากว่าเวลาจริงบน server เกินนี้ถือว่าเก่าเกินไป
+		MaxTapLagSeconds = 0.75, -- เวลาที่ client ส่งมาช้ากว่าเวลาจริงบน server เกินนี้ถือว่าเก่าเกินไป
 		PerfectGradeMinPerfectTaps = 3,
 		MissGradeMinMissTaps = 2,
 	},
@@ -101,6 +101,8 @@ return {
 	PromptHoldSeconds = 0,
 	PromptKeyCode = Enum.KeyCode.E,
 	TapKeyCode = Enum.KeyCode.Space,
+	TapActionName = "BakeTapKey", -- ชื่อ action ที่ผูกปุ่มกดระหว่างมินิเกม (กันตัวละครกระโดด)
+	TapActionPriority = 3000,
 	LabelWidthPixels = 200,
 	LabelHeightPixels = 76,
 	LabelOffsetStuds = 4,

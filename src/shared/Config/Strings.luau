@@ -139,8 +139,8 @@ local Messages: { [string]: Entry } = {
 		en = "Started baking {dish}. Wait {seconds}s, then use the oven.",
 	},
 	BakeMissingIngredients = {
-		th = "วัตถุดิบไม่พอ ขาด: {missing}",
-		en = "Not enough ingredients. Missing: {missing}",
+		th = "วัตถุดิบไม่พอ ขาด {name} อีก {count}",
+		en = "Not enough ingredients. Missing {count} x {name}.",
 	},
 	OvensBusy = {
 		th = "เตาอบไม่ว่าง เตาที่ว่างเร็วที่สุดอีก {seconds} วินาที",
@@ -179,16 +179,16 @@ local Messages: { [string]: Entry } = {
 		en = "Minigame started! Tap in the zone {count} times.",
 	},
 	MinigameGradePerfect = {
-		th = "ยอดเยี่ยม! ระดับ Perfect ได้{dish} {amount} ชิ้น",
-		en = "Perfect grade! You get {amount} x {dish}.",
+		th = "ยอดเยี่ยม! ระดับ Perfect",
+		en = "Perfect grade!",
 	},
 	MinigameGradeGood = {
-		th = "ระดับ Good ได้{dish} {amount} ชิ้น",
-		en = "Good grade! You get {amount} x {dish}.",
+		th = "ระดับ Good",
+		en = "Good grade!",
 	},
 	MinigameGradeMiss = {
-		th = "ระดับ Miss ได้{dish} {amount} ชิ้น",
-		en = "Miss grade. You get {amount} x {dish}.",
+		th = "ระดับ Miss",
+		en = "Miss grade.",
 	},
 	MinigameRejected = {
 		th = "ผลการกดครั้งนี้ไม่ผ่านการตรวจ นับเป็น Miss",

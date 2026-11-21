@@ -3,10 +3,10 @@
 -- client ส่งได้แค่ "ขออบสูตรไหน" / "ขอเก็บ (เตา)" / "เวลาที่กด" server ตัดสินผลทั้งหมด
 -- เวลาที่แสดงคำนวณจาก ReadyAt / StartedAt ที่ server ส่งมา
 
+local ContextActionService = game:GetService("ContextActionService")
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
-local UserInputService = game:GetService("UserInputService")
 local Workspace = game:GetService("Workspace")
 
 local Bake = require(ReplicatedStorage.Shared.Config.Bake)
@@ -45,7 +45,7 @@ type ActiveMinigame = {
 	Zones: { number },
 	TapsSent: number,
 	Heartbeat: RBXScriptConnection,
-	Input: RBXScriptConnection,
+	ActionName: string,
 }
 
 local BakeController = {}
@@ -186,6 +186,10 @@ local function refreshMenu()
 	if close then
 		close.Text = Strings.Format("UiMixClose", language, nil)
 	end
+	local tap = tapButton
+	if tap then
+		tap.Text = Strings.Format("UiMinigameTap", language, nil)
+	end
 	for recipeId, button in recipeButtons do
 		local recipe = Recipes[recipeId]
 		if recipe == nil then
@@ -251,7 +255,7 @@ local function closeMinigame()
 	active = nil
 	if session then
 		session.Heartbeat:Disconnect()
-		session.Input:Disconnect()
+		ContextActionService:UnbindAction(session.ActionName)
 	end
 	local view = minigameView
 	if view then
@@ -293,18 +297,26 @@ local function openMinigame(ovenId: number, startedAt: number, zones: { number }
 		end
 		view.Line.Position = UDim2.fromScale(BakeRhythm.LinePosition(now - startedAt), 0)
 	end)
-	local input = UserInputService.InputBegan:Connect(function(inputObject: InputObject, processed: boolean)
-		if not processed and inputObject.KeyCode == Bake.TapKeyCode then
-			sendTap()
-		end
-	end)
+	-- Sink ปุ่มกด เพื่อไม่ให้ตัวละครกระโดดตอนกด Space
+	ContextActionService:BindActionAtPriority(
+		Bake.TapActionName,
+		function(_name: string, state: Enum.UserInputState, _input: InputObject): Enum.ContextActionResult?
+			if state == Enum.UserInputState.Begin then
+				sendTap()
+			end
+			return Enum.ContextActionResult.Sink
+		end,
+		false,
+		Bake.TapActionPriority,
+		Bake.TapKeyCode
+	)
 	local session: ActiveMinigame = {
 		OvenId = ovenId,
 		StartedAt = startedAt,
 		Zones = zones,
 		TapsSent = 0,
 		Heartbeat = heartbeat,
-		Input = input,
+		ActionName = Bake.TapActionName,
 	}
 	active = session
 	view.Result.Text = ""
@@ -521,10 +533,17 @@ local function roundCorners(instance: Instance)
 end
 
 local function styleText(label: TextLabel | TextButton, size: number)
-	label.Font = Bake.Font
-	label.TextSize = size
-	label.TextColor3 = Bake.TextColor
-	label.TextWrapped = true
+	if label:IsA("TextLabel") then
+		label.Font = Bake.Font
+		label.TextSize = size
+		label.TextColor3 = Bake.TextColor
+		label.TextWrapped = true
+	elseif label:IsA("TextButton") then
+		label.Font = Bake.Font
+		label.TextSize = size
+		label.TextColor3 = Bake.TextColor
+		label.TextWrapped = true
+	end
 end
 
 local function createMenu(gui: ScreenGui)
@@ -692,10 +711,6 @@ local function createGui()
 	createMinigame(gui)
 	gui.Parent = playerGui
 	refreshMenu()
-	local tap = tapButton
-	if tap then
-		tap.Text = Strings.Format("UiMinigameTap", language, nil)
-	end
 end
 
 local function cleanup()

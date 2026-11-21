@@ -552,7 +552,10 @@ end
 -- แต่ละตัวครอบ pcall: ถ้า error จะ warn แล้วเซฟต่อตามปกติ
 local function runBeforeSave(player: Player, data: PlayerData)
 	for _, handler in table.clone(beforeSaveHandlers) do
-		local ok, err = pcall(handler, player, data)
+		local ok, err = pcall(function(): string?
+			handler(player, data)
+			return nil
+		end)
 		if not ok then
 			warn(`{LOG} OnBeforeSave handler ของ {player.Name} error (เซฟต่อตามปกติ): {tostring(err)}`)
 		end
