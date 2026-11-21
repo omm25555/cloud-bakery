@@ -28,10 +28,6 @@ local languageProvider: (Player) -> string = function(_player: Player): string
 	return PlayerDataConfig.DefaultLanguage
 end
 
-local limiter = RateLimiter.new(RateLimits, function(player: Player, _remoteName: string)
-	NotifyService.NotifyRateLimited(player)
-end)
-
 -- DataService ตั้งให้ เพื่อให้ NotifyService ไม่ต้อง require DataService (กันพึ่งกันเป็นวง)
 function NotifyService.SetLanguageProvider(provider: (Player) -> string)
 	languageProvider = provider
@@ -118,6 +114,11 @@ function NotifyService.NotifyRateLimited(player: Player)
 	lastRateNotice[player] = now
 	NotifyService.Notify(player, "RateLimited", "error")
 end
+
+-- ประกาศหลัง NotifyRateLimited เพื่อให้ --!strict รู้จัก key นี้ ใช้เฉพาะใน onClientReady
+local limiter = RateLimiter.new(RateLimits, function(player: Player, _remoteName: string)
+	NotifyService.NotifyRateLimited(player)
+end)
 
 local function onPlayerRemoving(player: Player)
 	readyPlayers[player] = nil
