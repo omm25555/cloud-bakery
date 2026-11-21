@@ -15,6 +15,9 @@ local Config: RateLimitsConfig = {
 	Default = { Capacity = 10, RefillPerSecond = 10 },
 	Remotes = {
 		NotifyReady = { Capacity = 2, RefillPerSecond = 0.2 },
+		FarmPlant = { Capacity = 4, RefillPerSecond = 2 },
+		FarmHarvest = { Capacity = 4, RefillPerSecond = 2 },
+		FarmSync = { Capacity = 2, RefillPerSecond = 0.2 },
 	},
 	WarnCooldownSeconds = 5,
 	NotifyCooldownSeconds = 5,

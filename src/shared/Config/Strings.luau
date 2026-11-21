@@ -50,6 +50,90 @@ local Messages: { [string]: Entry } = {
 		th = "ข้อมูลของคุณมีรูปแบบที่ไม่ถูกต้อง ระบบไม่ได้แก้ไขข้อมูลเดิม กรุณาติดต่อผู้พัฒนา",
 		en = "Your data has an invalid format. It was not modified. Please contact the developers.",
 	},
+	PlantOk = {
+		th = "ปลูก{crop}แล้ว รอให้โตนะ",
+		en = "Planted {crop}. Wait for it to grow!",
+	},
+	HarvestOk = {
+		th = "เก็บ{crop}ได้ {amount} ชิ้น",
+		en = "Harvested {amount} x {crop}.",
+	},
+	HarvestByOther = {
+		th = "{player} เก็บ{crop} {amount} ชิ้นจากแปลงของคุณ",
+		en = "{player} harvested {amount} x {crop} from your plot.",
+	},
+	NotReady = {
+		th = "{crop}ยังไม่โต เหลืออีก {seconds} วินาที",
+		en = "{crop} isn't ready yet. {seconds} seconds left.",
+	},
+	PlotOccupied = {
+		th = "แปลงนี้มีพืชอยู่แล้ว",
+		en = "This plot already has a crop.",
+	},
+	PlotEmpty = {
+		th = "แปลงนี้ว่าง ไม่มีอะไรให้เก็บ",
+		en = "This plot is empty. Nothing to harvest.",
+	},
+	InventoryFull = {
+		th = "กระเป๋าเต็ม เก็บไม่ได้ พืชยังอยู่ในแปลง",
+		en = "Your bag is full. The crop stays in the plot.",
+	},
+	DataNotReady = {
+		th = "ข้อมูลของคุณยังโหลดไม่เสร็จ กรุณารอสักครู่",
+		en = "Your data is still loading. Please wait a moment.",
+	},
+	TooFar = {
+		th = "อยู่ไกลแปลงเกินไป เดินเข้าไปใกล้ ๆ ก่อน",
+		en = "You're too far from the plot. Move closer.",
+	},
+	InvalidRequest = {
+		th = "คำขอไม่ถูกต้อง ทำรายการไม่ได้",
+		en = "Invalid request. Couldn't do that.",
+	},
+	NoPermission = {
+		th = "แปลงนี้เก็บได้เฉพาะคนปลูก",
+		en = "Only the planter can harvest this plot.",
+	},
+	NotEnoughCoins = {
+		th = "เหรียญไม่พอ ต้องใช้ {cost} เหรียญ",
+		en = "Not enough coins. You need {cost}.",
+	},
+	UiPlotEmpty = {
+		th = "แปลงว่าง",
+		en = "Empty plot",
+	},
+	UiPlotGrowing = {
+		th = "{crop} กำลังโต\nเหลือ {seconds} วินาที",
+		en = "{crop} growing\n{seconds}s left",
+	},
+	UiPlotReady = {
+		th = "{crop} พร้อมเก็บ!",
+		en = "{crop} ready!",
+	},
+	UiPromptPlant = {
+		th = "ปลูก{crop}",
+		en = "Plant {crop}",
+	},
+	UiPromptHarvest = {
+		th = "เก็บเกี่ยว",
+		en = "Harvest",
+	},
+	UiPromptObject = {
+		th = "แปลงปลูก",
+		en = "Farm plot",
+	},
+	UiInventoryTitle = {
+		th = "กระเป๋า {used}/{capacity}",
+		en = "Bag {used}/{capacity}",
+	},
+	UiInventoryItem = {
+		th = "{name} x{count}",
+		en = "{name} x{count}",
+	},
+	UiInventoryEmpty = {
+		th = "(ว่าง)",
+		en = "(empty)",
+	},
 }
 
 local Strings = {}
