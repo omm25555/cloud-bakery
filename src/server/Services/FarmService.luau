@@ -121,7 +121,7 @@ local function readPlotId(raw: unknown): Plot?
 end
 
 local function isNearPlot(player: Player, plot: Plot): boolean
-	local part = plotParts[plot.Id]
+	local part: BasePart? = plotParts[plot.Id]
 	local character = player.Character
 	if part == nil or character == nil then
 		return false
@@ -135,20 +135,20 @@ local function isNearPlot(player: Player, plot: Plot): boolean
 end
 
 -- ตรวจแปลง/ข้อมูลผู้เล่น/ระยะ ร่วมกันของปลูกและเก็บ คืน nil ถ้าปฏิเสธแล้ว
-local function checkContext(player: Player, remoteName: string, plotIdRaw: unknown): (Plot, PlayerData)?
+local function checkContext(player: Player, remoteName: string, plotIdRaw: unknown): (Plot?, PlayerData?)
 	local plot = readPlotId(plotIdRaw)
 	if plot == nil then
 		reject(player, remoteName, `plotId ไม่ถูกต้อง ({tostring(plotIdRaw)})`, "InvalidRequest", nil)
-		return nil
+		return nil, nil
 	end
 	local data = DataService.GetData(player)
 	if data == nil then
 		reject(player, remoteName, "ข้อมูลผู้เล่นยังโหลดไม่เสร็จ", "DataNotReady", nil)
-		return nil
+		return nil, nil
 	end
 	if not isNearPlot(player, plot) then
 		reject(player, remoteName, `อยู่ไกลแปลง {plot.Id} เกินระยะ หรือไม่มีตัวละคร`, "TooFar", nil)
-		return nil
+		return nil, nil
 	end
 	return plot, data
 end
@@ -176,7 +176,8 @@ local function onPlant(player: Player, plotIdRaw: unknown, cropIdRaw: unknown)
 	end
 	if Farm.PlantCost > 0 then
 		if data.Coins < Farm.PlantCost then
-			reject(player, "FarmPlant", `เหรียญไม่พอ ({data.Coins}/{Farm.PlantCost})`, "NotEnoughCoins", { cost = Farm.PlantCost })
+			local args: { [string]: string | number } = { cost = Farm.PlantCost }
+			reject(player, "FarmPlant", `เหรียญไม่พอ ({data.Coins}/{Farm.PlantCost})`, "NotEnoughCoins", args)
 			return
 		end
 		data.Coins -= Farm.PlantCost
@@ -189,7 +190,8 @@ local function onPlant(player: Player, plotIdRaw: unknown, cropIdRaw: unknown)
 	plot.PlantedBy = player.UserId
 
 	broadcastPlot(plot)
-	NotifyService.Notify(player, "PlantOk", "success", { crop = cropName(player, crop.Id) })
+	local okArgs: { [string]: string | number } = { crop = cropName(player, crop.Id) }
+	NotifyService.Notify(player, "PlantOk", "success", okArgs)
 end
 
 local function onHarvest(player: Player, plotIdRaw: unknown)
@@ -219,12 +221,13 @@ local function onHarvest(player: Player, plotIdRaw: unknown)
 
 	local remaining = readyAt - Workspace:GetServerTimeNow()
 	if remaining > 0 then
+		local args: { [string]: string | number } = { crop = cropName(player, cropId), seconds = math.ceil(remaining) }
 		reject(
 			player,
 			"FarmHarvest",
 			`แปลง {plot.Id} ยังไม่โต (เหลือ {string.format("%.1f", remaining)} วินาที)`,
 			"NotReady",
-			{ crop = cropName(player, cropId), seconds = math.ceil(remaining) }
+			args
 		)
 		return
 	end
@@ -251,17 +254,15 @@ local function onHarvest(player: Player, plotIdRaw: unknown)
 
 	broadcastPlot(plot)
 	sendInventory(player, data)
-	NotifyService.Notify(player, "HarvestOk", "success", { crop = cropName(player, cropId), amount = amount })
+	local okArgs: { [string]: string | number } = { crop = cropName(player, cropId), amount = amount }
+	NotifyService.Notify(player, "HarvestOk", "success", okArgs)
 
 	if plantedBy ~= nil and plantedBy ~= player.UserId then
 		local planter = Players:GetPlayerByUserId(plantedBy)
 		if planter then
-			NotifyService.Notify(
-				planter,
-				"HarvestByOther",
-				"info",
-				{ player = player.Name, crop = cropName(planter, cropId), amount = amount }
-			)
+			local otherArgs: { [string]: string | number } =
+				{ player = player.DisplayName, crop = cropName(planter, cropId), amount = amount }
+			NotifyService.Notify(planter, "HarvestByOther", "info", otherArgs)
 		end
 	end
 end

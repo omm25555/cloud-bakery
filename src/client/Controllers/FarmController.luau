@@ -61,17 +61,20 @@ local function refreshView(view: PlotView)
 	if cropId == nil or readyAt == nil then
 		view.Label.Text = Strings.Format("UiPlotEmpty", language, nil)
 		view.Label.TextColor3 = Farm.StateColors.Empty
-		prompt.ActionText = Strings.Format("UiPromptPlant", language, { crop = cropName(selectedCrop) })
+		local plantArgs: { [string]: string | number } = { crop = cropName(selectedCrop) }
+		prompt.ActionText = Strings.Format("UiPromptPlant", language, plantArgs)
 		return
 	end
 
 	prompt.ActionText = Strings.Format("UiPromptHarvest", language, nil)
 	local remaining = readyAt - Workspace:GetServerTimeNow()
+	local cropArgs: { [string]: string | number } = { crop = cropName(cropId) }
 	if remaining > 0 then
-		view.Label.Text = Strings.Format("UiPlotGrowing", language, { crop = cropName(cropId), seconds = math.ceil(remaining) })
+		local growArgs: { [string]: string | number } = { crop = cropName(cropId), seconds = math.ceil(remaining) }
+		view.Label.Text = Strings.Format("UiPlotGrowing", language, growArgs)
 		view.Label.TextColor3 = Farm.StateColors.Growing
 	else
-		view.Label.Text = Strings.Format("UiPlotReady", language, { crop = cropName(cropId) })
+		view.Label.Text = Strings.Format("UiPlotReady", language, cropArgs)
 		view.Label.TextColor3 = Farm.StateColors.Ready
 	end
 end
@@ -125,14 +128,16 @@ local function refreshInventory()
 	for _, count in inventory do
 		used += count
 	end
-	local lines = { Strings.Format("UiInventoryTitle", language, { used = used, capacity = Farm.InventoryCapacity }) }
+	local titleArgs: { [string]: string | number } = { used = used, capacity = Farm.InventoryCapacity }
+	local lines = { Strings.Format("UiInventoryTitle", language, titleArgs) }
 	local hasItems = false
 	for _, cropId in Farm.CropOrder do
 		local crop = Crops[cropId]
 		local count = if crop then inventory[crop.IngredientId] else nil
 		if crop and count and count > 0 then
 			hasItems = true
-			table.insert(lines, Strings.Format("UiInventoryItem", language, { name = ingredientName(crop.IngredientId), count = count }))
+			local itemArgs: { [string]: string | number } = { name = ingredientName(crop.IngredientId), count = count }
+			table.insert(lines, Strings.Format("UiInventoryItem", language, itemArgs))
 		end
 	end
 	if not hasItems then
