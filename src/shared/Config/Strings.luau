@@ -134,6 +134,174 @@ local Messages: { [string]: Entry } = {
 		th = "(ว่าง)",
 		en = "(empty)",
 	},
+	BakeStartOk = {
+		th = "เริ่มอบ{dish}แล้ว รออีก {seconds} วินาที แล้วไปกดที่เตา",
+		en = "Started baking {dish}. Wait {seconds}s, then use the oven.",
+	},
+	BakeMissingIngredients = {
+		th = "วัตถุดิบไม่พอ ขาด {name} อีก {count}",
+		en = "Not enough ingredients. Missing {count} x {name}.",
+	},
+	OvensBusy = {
+		th = "เตาอบไม่ว่าง เตาที่ว่างเร็วที่สุดอีก {seconds} วินาที",
+		en = "All ovens are busy. The soonest one is ready in {seconds}s.",
+	},
+	OvensBusyWaiting = {
+		th = "เตาอบไม่ว่าง ทุกเตายังมีขนมรอเก็บหรือกำลังเล่นมินิเกม",
+		en = "All ovens are busy. Each one has a bake waiting or a minigame in progress.",
+	},
+	BakeNotReady = {
+		th = "{dish}ยังอบไม่เสร็จ เหลืออีก {seconds} วินาที",
+		en = "{dish} isn't done baking yet. {seconds} seconds left.",
+	},
+	OvenIdle = {
+		th = "เตานี้ว่าง ไม่มีขนมให้เก็บ",
+		en = "This oven is empty. Nothing to collect.",
+	},
+	OvenNotYours = {
+		th = "เตานี้เป็นของ {owner}",
+		en = "This oven belongs to {owner}.",
+	},
+	BakeTooFar = {
+		th = "อยู่ไกลเกินไป เดินเข้าไปใกล้โต๊ะหรือเตาก่อน",
+		en = "You're too far away. Move closer to the table or oven.",
+	},
+	BakeNoRoom = {
+		th = "กระเป๋าไม่มีที่พอสำหรับขนมที่จะได้ เหลือที่ {free} ต้องการ {need} กรุณาเคลียร์กระเป๋าก่อน",
+		en = "Not enough bag space for the bake. Free: {free}, needed: {need}. Clear some space first.",
+	},
+	BakeCollectFull = {
+		th = "กระเป๋าเต็ม เหลือที่ {free} ต้องการ {need} ขนมยังรออยู่ในเตา เคลียร์กระเป๋าแล้วกดเตาอีกครั้ง",
+		en = "Your bag is full. Free: {free}, needed: {need}. The bake stays in the oven. Clear space and use the oven again.",
+	},
+	MinigameStart = {
+		th = "มินิเกมเริ่มแล้ว! กดให้ตรงโซน {count} ครั้ง",
+		en = "Minigame started! Tap in the zone {count} times.",
+	},
+	MinigameGradePerfect = {
+		th = "ยอดเยี่ยม! ระดับ Perfect",
+		en = "Perfect grade!",
+	},
+	MinigameGradeGood = {
+		th = "ระดับ Good",
+		en = "Good grade!",
+	},
+	MinigameGradeMiss = {
+		th = "ระดับ Miss",
+		en = "Miss grade.",
+	},
+	MinigameRejected = {
+		th = "ผลการกดครั้งนี้ไม่ผ่านการตรวจ นับเป็น Miss",
+		en = "That tap didn't pass validation. Counted as a Miss.",
+	},
+	MinigameTimeout = {
+		th = "หมดเวลามินิเกม ครั้งที่ไม่ได้กดนับเป็น Miss",
+		en = "Minigame timed out. Missed taps count as Miss.",
+	},
+	MinigameNotActive = {
+		th = "ตอนนี้ไม่มีมินิเกมที่เตานี้ (อาจหมดเวลาแล้ว)",
+		en = "There's no minigame at this oven right now (it may have timed out).",
+	},
+	BakeCollected = {
+		th = "ได้{dish} {amount} ชิ้น ใส่กระเป๋าแล้ว",
+		en = "Got {amount} x {dish}. Added to your bag.",
+	},
+	BakeCollectWarn = {
+		th = "{dish} รอเก็บอยู่ในเตา อีก {seconds} วินาทีจะใส่กระเป๋าให้อัตโนมัติ",
+		en = "Your {dish} is waiting in the oven. It will be moved to your bag automatically in {seconds}s.",
+	},
+	BakeAutoCollected = {
+		th = "หมดเวลารอเก็บ ใส่{dish} {amount} ชิ้นเข้ากระเป๋าให้แล้ว เตาว่างแล้ว",
+		en = "Time's up. Added {amount} x {dish} to your bag. The oven is free again.",
+	},
+	BakeAutoCollectedPartial = {
+		th = "หมดเวลารอเก็บ ใส่{dish}ได้ {amount} ชิ้น แต่เสียไป {lost} ชิ้นเพราะกระเป๋าเต็ม เตาว่างแล้ว",
+		en = "Time's up. Added {amount} x {dish}, but lost {lost} because your bag was full. The oven is free again.",
+	},
+	BakeAutoCollectedLost = {
+		th = "หมดเวลารอเก็บ {dish} {lost} ชิ้นหายไปเพราะกระเป๋าเต็ม เตาว่างแล้ว",
+		en = "Time's up. {lost} x {dish} was lost because your bag was full. The oven is free again.",
+	},
+	UiBakeMixObject = {
+		th = "โต๊ะผสม",
+		en = "Mixing table",
+	},
+	UiBakeMixPrompt = {
+		th = "ผสมขนม",
+		en = "Mix a bake",
+	},
+	UiBakeMixLabel = {
+		th = "โต๊ะผสม\nเลือกสูตรแล้วใส่เตาที่ว่าง",
+		en = "Mixing table\nPick a recipe for a free oven",
+	},
+	UiOvenObject = {
+		th = "เตาอบ",
+		en = "Oven",
+	},
+	UiOvenPromptCollect = {
+		th = "เก็บขนม",
+		en = "Collect bake",
+	},
+	UiOvenPromptCheck = {
+		th = "ดูเตา",
+		en = "Check oven",
+	},
+	UiOvenIdle = {
+		th = "เตาว่าง",
+		en = "Oven empty",
+	},
+	UiOvenBaking = {
+		th = "{dish} กำลังอบ\nเหลือ {seconds} วินาที\nของ {owner}",
+		en = "{dish} baking\n{seconds}s left\n{owner}'s oven",
+	},
+	UiOvenReady = {
+		th = "{dish} อบเสร็จ!\nกดเพื่อเล่นมินิเกม\nของ {owner}",
+		en = "{dish} is done!\nUse it to play the minigame\n{owner}'s oven",
+	},
+	UiOvenMinigame = {
+		th = "{owner} กำลังเล่นมินิเกม",
+		en = "{owner} is playing the minigame",
+	},
+	UiOvenDone = {
+		th = "{dish} x{amount} รอเก็บ\nของ {owner}",
+		en = "{dish} x{amount} waiting\n{owner}'s oven",
+	},
+	UiMixTitle = {
+		th = "เลือกสูตร",
+		en = "Choose a recipe",
+	},
+	UiMixClose = {
+		th = "ปิด",
+		en = "Close",
+	},
+	UiMixRecipe = {
+		th = "{dish}\nต้องใช้: {needs}",
+		en = "{dish}\nNeeds: {needs}",
+	},
+	UiMixNeedItem = {
+		th = "{name} {have}/{need}",
+		en = "{name} {have}/{need}",
+	},
+	UiMinigameTitle = {
+		th = "กดให้ตรงโซน ({index}/{count})",
+		en = "Tap in the zone ({index}/{count})",
+	},
+	UiMinigameTap = {
+		th = "กด!",
+		en = "Tap!",
+	},
+	UiJudgePerfect = {
+		th = "Perfect!",
+		en = "Perfect!",
+	},
+	UiJudgeGood = {
+		th = "Good!",
+		en = "Good!",
+	},
+	UiJudgeMiss = {
+		th = "Miss",
+		en = "Miss",
+	},
 }
 
 local Strings = {}

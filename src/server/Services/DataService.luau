@@ -17,6 +17,7 @@ type PlayerData = PlayerDataConfig.PlayerData
 type RetryConfig = PlayerDataConfig.RetryConfig
 type Outcome = "Ok" | "Retry" | "Fatal" | "Aborted"
 type FailReason = "Newer" | "Corrupt" | "Locked" | "Error"
+type BeforeSaveHandler = (player: Player, data: PlayerData) -> ()
 
 type Session = {
 	Player: Player,
@@ -57,6 +58,8 @@ local temporaryMode = false
 local dataStore: DataStore? = nil
 
 local random = Random.new()
+
+local beforeSaveHandlers: { BeforeSaveHandler } = {}
 
 -- migrations[v] แปลงข้อมูล Version v ให้เป็น v + 1 (แก้ raw ตรง ๆ)
 local migrations: { [number]: ({ [string]: any }) -> () } = {}
@@ -545,6 +548,20 @@ local function loadSession(session: Session)
 	busy -= 1
 end
 
+-- เรียก handler ของ OnBeforeSave แบบ synchronous (ก่อน copyData ของการเซฟสุดท้าย)
+-- แต่ละตัวครอบ pcall: ถ้า error จะ warn แล้วเซฟต่อตามปกติ
+local function runBeforeSave(player: Player, data: PlayerData)
+	for _, handler in table.clone(beforeSaveHandlers) do
+		local ok, err = pcall(function(): string?
+			handler(player, data)
+			return nil
+		end)
+		if not ok then
+			warn(`{LOG} OnBeforeSave handler ของ {player.Name} error (เซฟต่อตามปกติ): {tostring(err)}`)
+		end
+	end
+end
+
 local function finalizeSession(session: Session, retryCfg: RetryConfig)
 	if session.Finalizing then
 		return
@@ -555,6 +572,7 @@ local function finalizeSession(session: Session, retryCfg: RetryConfig)
 	if session.State == "Active" and not session.Temporary and session.Data then
 		local userId = session.Player.UserId
 		closingUserIds[userId] = true
+		runBeforeSave(session.Player, session.Data)
 		saveSession(session, true, retryCfg)
 		closingUserIds[userId] = nil
 	end
@@ -625,6 +643,18 @@ function DataService.GetData(player: Player): PlayerData?
 		return session.Data
 	end
 	return nil
+end
+
+-- ลงทะเบียน handler ที่ถูกเรียกแบบ synchronous ก่อนเซฟครั้งสุดท้ายของผู้เล่น (ตอนออกเกมและ BindToClose)
+-- handler แก้ data ได้และต้องไม่ yield คืนฟังก์ชันสำหรับยกเลิกการลงทะเบียน
+function DataService.OnBeforeSave(handler: BeforeSaveHandler): () -> ()
+	table.insert(beforeSaveHandlers, handler)
+	return function()
+		local index = table.find(beforeSaveHandlers, handler)
+		if index then
+			table.remove(beforeSaveHandlers, index)
+		end
+	end
 end
 
 function DataService.IsLoaded(player: Player): boolean
