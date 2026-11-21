@@ -75,6 +75,10 @@ return {
 	-- ถ้าเจ้าของออกแล้ว DataService ไม่ได้เรียก OnBeforeSave (เช่น โหมดชั่วคราว) รอเท่านี้แล้วเคลียร์เตา
 	OrphanCleanupSeconds = 2,
 
+	-- เตาที่รอเก็บ (อบเสร็จหรือจบมินิเกมแล้ว) หมดเวลาเอง: ใส่กระเป๋าให้เท่าที่ใส่ได้ ที่เหลือหาย แล้วคืนเตา
+	CollectTimeoutSeconds = 120,
+	CollectWarnSeconds = 30, -- แจ้งเตือนผู้เล่นก่อนหมดเวลาเท่านี้
+
 	ScoreRewards = ScoreRewards,
 	RecipeOrder = { "CloudBread", "Croissant", "StrawberryCake" },
 

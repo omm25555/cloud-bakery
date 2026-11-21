@@ -45,6 +45,7 @@ type Oven = {
 	Minigame: MinigameRun?,
 	Grade: Judgement?,
 	Amount: number?,
+	WaitId: number, -- รหัสรอบการรอเก็บ 0 = ไม่ได้รอ (ใช้ยกเลิก timer ที่ค้างอยู่)
 }
 
 type OvenEntry = {
@@ -74,6 +75,7 @@ local ovens: { Oven } = {}
 local ovenParts: { [number]: BasePart } = {}
 local mixingPart: BasePart? = nil
 local random = Random.new()
+local waitCounter = 0
 
 local maxReward = 0
 for _, amount in Bake.ScoreRewards do
@@ -161,6 +163,7 @@ local function resetOven(oven: Oven)
 	oven.Minigame = nil
 	oven.Grade = nil
 	oven.Amount = nil
+	oven.WaitId = 0
 end
 
 local function readOven(raw: unknown): Oven?
@@ -228,6 +231,75 @@ local function tryDeliver(player: Player, data: PlayerData, oven: Oven, remoteNa
 	return true
 end
 
+-- หมดเวลารอเก็บ: ใส่กระเป๋าเท่าที่ใส่ได้ (ตามระดับที่ทำได้ ถ้ายังไม่ได้เล่นมินิเกมนับเป็น Good) ที่เหลือหาย แล้วคืนเตา
+local function expireOven(oven: Oven, waitId: number)
+	if oven.WaitId ~= waitId or (oven.State ~= "Baking" and oven.State ~= "Done") then
+		return
+	end
+	local recipeId = oven.RecipeId
+	local ownerId = oven.OwnerUserId
+	local player = if ownerId then Players:GetPlayerByUserId(ownerId) else nil
+	local data = if player then DataService.GetData(player) else nil
+	if recipeId == nil or player == nil or data == nil then
+		warn(`{LOG} เตา {oven.Id} หมดเวลารอเก็บแต่ไม่มีเจ้าของ/ข้อมูล เคลียร์เตาโดยไม่ให้ของ`)
+		resetOven(oven)
+		broadcastOven(oven)
+		return
+	end
+	local amount = if oven.State == "Done" and oven.Amount ~= nil
+		then oven.Amount :: number
+		else (Bake.ScoreRewards.Good or 0)
+	local free = math.max(0, Farm.InventoryCapacity - inventoryTotal(data))
+	local current = data.Inventory[recipeId] or 0
+	local room = math.max(0, PlayerDataConfig.Limits.MaxItemCount - current)
+	local put = math.min(amount, free, room)
+	local lost = amount - put
+	if put > 0 then
+		data.Inventory[recipeId] = current + put
+	end
+	resetOven(oven)
+	broadcastOven(oven)
+	sendInventory(player, data)
+
+	local args: { [string]: string | number } = { dish = dishName(player, recipeId), amount = put, lost = lost }
+	if lost == 0 then
+		NotifyService.Notify(player, "BakeAutoCollected", "success", args)
+	elseif put > 0 then
+		warn(`{LOG} {player.Name} เตา {oven.Id} หมดเวลารอเก็บ กระเป๋าเต็ม ใส่ {recipeId} ได้ {put}/{amount} เสียไป {lost}`)
+		NotifyService.Notify(player, "BakeAutoCollectedPartial", "error", args)
+	else
+		warn(`{LOG} {player.Name} เตา {oven.Id} หมดเวลารอเก็บ กระเป๋าเต็ม {recipeId} x{amount} หายทั้งหมด`)
+		NotifyService.Notify(player, "BakeAutoCollectedLost", "error", args)
+	end
+	print(`{LOG} {player.Name} เตา {oven.Id} หมดเวลารอเก็บ ใส่ {recipeId} x{put} เสีย x{lost}`)
+end
+
+-- เริ่มนับเวลารอเก็บ (startAt = เวลา server ที่เตาเข้าสถานะรอเก็บ) เตือนก่อนหมดเวลาแล้วค่อยหมดเวลา
+local function beginWait(oven: Oven, startAt: number)
+	waitCounter += 1
+	local waitId = waitCounter
+	oven.WaitId = waitId
+	local deadline = startAt + Bake.CollectTimeoutSeconds
+	local now = Workspace:GetServerTimeNow()
+	local warnDelay = math.max(0, deadline - Bake.CollectWarnSeconds - now)
+	task.delay(warnDelay, function()
+		if oven.WaitId ~= waitId then
+			return
+		end
+		local ownerId = oven.OwnerUserId
+		local recipeId = oven.RecipeId
+		local player = if ownerId then Players:GetPlayerByUserId(ownerId) else nil
+		if player and recipeId then
+			local seconds = math.max(1, math.ceil(deadline - Workspace:GetServerTimeNow()))
+			local args: { [string]: string | number } = { dish = dishName(player, recipeId), seconds = seconds }
+			NotifyService.Notify(player, "BakeCollectWarn", "info", args)
+		end
+	end)
+	task.delay(math.max(0, deadline - now), function()
+		expireOven(oven, waitId)
+	end)
+end
+
 local function finishMinigame(oven: Oven, run: MinigameRun, timedOut: boolean)
 	if oven.Minigame ~= run or oven.State ~= "Minigame" then
 		return
@@ -238,6 +310,7 @@ local function finishMinigame(oven: Oven, run: MinigameRun, timedOut: boolean)
 	oven.State = "Done"
 	oven.Grade = grade
 	oven.Amount = amount
+	beginWait(oven, Workspace:GetServerTimeNow()) -- ใส่กระเป๋าสำเร็จด้านล่างจะ reset เตาและยกเลิกการรอนี้เอง
 
 	local ownerId = oven.OwnerUserId
 	local recipeId = oven.RecipeId
@@ -337,6 +410,7 @@ local function startMinigame(player: Player, oven: Oven)
 		LastOffset = nil,
 	}
 	oven.State = "Minigame"
+	oven.WaitId = 0 -- ยกเลิกการนับเวลารอเก็บระหว่างเล่นมินิเกม
 	oven.Minigame = run
 	broadcastOven(oven)
 	minigameEvent:FireClient(player, { OvenId = oven.Id, StartedAt = run.StartedAt, Zones = table.clone(zones) })
@@ -510,6 +584,7 @@ local function onStart(player: Player, recipeIdRaw: unknown)
 	freeOven.Minigame = nil
 	freeOven.Grade = nil
 	freeOven.Amount = nil
+	beginWait(freeOven, now + recipe.BakeTimeSeconds)
 
 	broadcastOven(freeOven)
 	sendInventory(player, data)
@@ -544,6 +619,7 @@ local function onBeforeSave(player: Player, data: PlayerData)
 				grantOnLeave(player, data, id, need, `ออกระหว่างอบ เตา {oven.Id}: คืนวัตถุดิบ`)
 			end
 		else
+			-- เจ้าของโปรเจกต์ยืนยันแทนข้อ 7.1 เดิม: ออกตอนอบเสร็จ/Done ได้ตามระดับที่ทำได้จริง (Done ใช้ Amount ของระดับนั้น) ไม่ใช่ Good เสมอ
 			local amount = if oven.State == "Done" and oven.Amount ~= nil
 				then oven.Amount :: number
 				else (Bake.ScoreRewards.Good or 0)
@@ -646,7 +722,7 @@ local function createStations()
 		local part, line = createStationPart(spec, anchor, Bake.KindOven, folder)
 		part:SetAttribute(Bake.OvenIdAttribute, index)
 		ovenParts[index] = part
-		ovens[index] = { Id = index, State = "Idle" }
+		ovens[index] = { Id = index, State = "Idle", WaitId = 0 }
 		table.insert(logLines, line)
 	end
 	folder.Parent = Workspace

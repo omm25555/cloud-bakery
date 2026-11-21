@@ -206,6 +206,22 @@ local Messages: { [string]: Entry } = {
 		th = "ได้{dish} {amount} ชิ้น ใส่กระเป๋าแล้ว",
 		en = "Got {amount} x {dish}. Added to your bag.",
 	},
+	BakeCollectWarn = {
+		th = "{dish} รอเก็บอยู่ในเตา อีก {seconds} วินาทีจะใส่กระเป๋าให้อัตโนมัติ",
+		en = "Your {dish} is waiting in the oven. It will be moved to your bag automatically in {seconds}s.",
+	},
+	BakeAutoCollected = {
+		th = "หมดเวลารอเก็บ ใส่{dish} {amount} ชิ้นเข้ากระเป๋าให้แล้ว เตาว่างแล้ว",
+		en = "Time's up. Added {amount} x {dish} to your bag. The oven is free again.",
+	},
+	BakeAutoCollectedPartial = {
+		th = "หมดเวลารอเก็บ ใส่{dish}ได้ {amount} ชิ้น แต่เสียไป {lost} ชิ้นเพราะกระเป๋าเต็ม เตาว่างแล้ว",
+		en = "Time's up. Added {amount} x {dish}, but lost {lost} because your bag was full. The oven is free again.",
+	},
+	BakeAutoCollectedLost = {
+		th = "หมดเวลารอเก็บ {dish} {lost} ชิ้นหายไปเพราะกระเป๋าเต็ม เตาว่างแล้ว",
+		en = "Time's up. {lost} x {dish} was lost because your bag was full. The oven is free again.",
+	},
 	UiBakeMixObject = {
 		th = "โต๊ะผสม",
 		en = "Mixing table",
