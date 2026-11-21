@@ -125,6 +125,7 @@ local Strings: { [string]: Entry } = {
 	["n.customerArrived"] = { th = "{animal} มาแล้ว! อยากได้ {recipe} x{amount}", en = "{animal} arrived and wants {recipe} x{amount}" },
 	["n.served"] = { th = "เสิร์ฟ {animal} สำเร็จ! +{coins} เหรียญ +{rep} ชื่อเสียง", en = "Served {animal}! +{coins} coins +{rep} reputation" },
 	["n.servedByOther"] = { th = "{player} เสิร์ฟ {animal} แล้ว", en = "{player} served {animal}" },
+	["n.orderTaken"] = { th = "{animal} ได้ขนมแล้ว รอลูกค้าคนถัดไปนะ", en = "{animal} has already been served, wait for the next customer" },
 	["n.notEnoughGoods"] = { th = "{animal} อยากได้ {recipe} x{amount} แต่มีแค่ {have}", en = "{animal} wants {recipe} x{amount}, you have {have}" },
 	["n.customerLeft"] = { th = "{animal} รอไม่ไหว กลับไปแล้ว", en = "{animal} got tired of waiting and left" },
 	["n.customerNotSeated"] = { th = "รอให้ลูกค้านั่งก่อนนะ", en = "Wait for the customer to sit down" },

@@ -61,7 +61,7 @@ end
 local function makeBillboard(anchor: BasePart, offsetY: number): TextLabel
 	local gui = Instance.new("BillboardGui")
 	gui.Name = "CropTimer"
-	gui.Size = UDim2.fromOffset(110, 34)
+	gui.Size = UDim2.fromScale(3.6, 1.1)
 	gui.StudsOffsetWorldSpace = Vector3.new(0, offsetY, 0)
 	gui.MaxDistance = 70
 	gui.AlwaysOnTop = false

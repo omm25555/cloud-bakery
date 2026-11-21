@@ -47,6 +47,7 @@ local languageLimiter = RateLimiter.new(languageLimit.MaxCalls, languageLimit.Wi
 -- Studio ที่ไม่ได้เปิด API Services หรือ place ที่ยังไม่ publish ใช้ DataStore ไม่ได้
 local function isStudioApiError(message: string): boolean
 	return string.find(message, "StudioAccessToApisNotAllowed", 1, true) ~= nil
+		or string.find(message, "Studio access to APIs is not allowed", 1, true) ~= nil
 		or string.find(message, "publish", 1, true) ~= nil
 end
 
@@ -249,6 +250,8 @@ local function saveProfile(player: Player, profile: Profile, notifyPlayer: boole
 		end
 	end
 	profile.saving = true
+	-- ล้าง dirty ก่อนเริ่มบันทึก ถ้ามี update() ระหว่างรอ UpdateAsync จะตั้ง dirty ใหม่ และรอบถัดไปจะบันทึกให้
+	profile.dirty = false
 	local snapshot = profile.data
 	local maxAttempts = GameConfig.DataRetryAttempts
 	local saved = false
@@ -273,9 +276,8 @@ local function saveProfile(player: Player, profile: Profile, notifyPlayer: boole
 		end
 	end
 	profile.saving = false
-	if saved then
-		profile.dirty = false
-	else
+	if not saved then
+		profile.dirty = true
 		task.spawn(error, `[{SOURCE}] บันทึกข้อมูล {player.Name} ล้มเหลวครบทุกครั้ง: {lastError}`, 0)
 		if notifyPlayer and player.Parent == Players then
 			NotifyService.blocked(player, "n.saveFailed")

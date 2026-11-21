@@ -40,6 +40,10 @@ local Game = {
 	NotifyMaxVisible = 4,
 	StatePushDebounceSeconds = 0.1,
 	WorldTimerRefreshSeconds = 1,
+	-- กันดับเบิลคลิกปุ่มอัปเกรด
+	UpgradeClickCooldownSeconds = 0.4,
+	-- ความถี่ตรวจว่าขึ้นวันใหม่ (UTC) เพื่อรีเซ็ตภารกิจของคนที่ออนไลน์อยู่
+	QuestDayCheckSeconds = 30,
 }
 
 return Game

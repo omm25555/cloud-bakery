@@ -1,6 +1,7 @@
 --!strict
 -- ภารกิจรายวัน: นับความคืบหน้า รีเซ็ตเมื่อขึ้นวันใหม่ (UTC) และให้รางวัลเมื่อครบทั้ง 3 ข้อ
 
+local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local Shared = ReplicatedStorage.Shared
@@ -104,6 +105,23 @@ end
 function QuestService.Start()
 	PlayerDataService.onLoaded(function(player: Player, _data: Types.SaveData)
 		PlayerDataService.update(player, refreshDay)
+	end)
+
+	-- ผู้เล่นที่ออนไลน์ข้ามเที่ยงคืน (UTC) ต้องเห็นภารกิจวันใหม่ทันที ไม่ใช่ค้างของเมื่อวาน
+	task.spawn(function()
+		local lastDay = today()
+		while true do
+			task.wait(GameConfig.QuestDayCheckSeconds)
+			local day = today()
+			if day ~= lastDay then
+				lastDay = day
+				for _, player in Players:GetPlayers() do
+					if PlayerDataService.isLoaded(player) then
+						PlayerDataService.update(player, refreshDay)
+					end
+				end
+			end
+		end
 	end)
 
 	claimFunction.OnServerInvoke = function(player: Player): Types.SimpleResult

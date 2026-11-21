@@ -67,7 +67,8 @@ function StateController.t(key: string, args: { [string]: string | number }?, la
 		local copy: { [string]: string | number } = {}
 		for name, value in args do
 			if typeof(value) == "string" and Locale.has(value) then
-				copy[name] = Locale.get(lang, value)
+				-- ส่ง args ชุดเดิมต่อ เพราะข้อความที่ซ้อนอยู่อาจมีตัวแปร เช่น {goal} ในชื่อภารกิจ
+				copy[name] = Locale.get(lang, value, args)
 			else
 				copy[name] = value
 			end

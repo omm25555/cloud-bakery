@@ -302,6 +302,10 @@ local function collectOven(player: Player)
 		NotifyService.blocked(player, "n.tooFast")
 		return
 	end
+	if WorldService.distanceTo(player, WorldService.getStations().oven) > GameConfig.InteractMaxDistance then
+		NotifyService.rejected(SOURCE, player, "เก็บขนมจากเตาจากระยะไกลเกินไป", "n.tooFar")
+		return
+	end
 	local data = PlayerDataService.get(player)
 	if data == nil then
 		NotifyService.blocked(player, "n.loading")
@@ -360,6 +364,10 @@ end
 local function onMixPrompt(player: Player)
 	if not promptLimiter.allow(player) then
 		NotifyService.blocked(player, "n.tooFast")
+		return
+	end
+	if WorldService.distanceTo(player, WorldService.getStations().mixingTable) > GameConfig.InteractMaxDistance then
+		NotifyService.rejected(SOURCE, player, "เปิดโต๊ะผสมจากระยะไกลเกินไป", "n.tooFar")
 		return
 	end
 	local data = PlayerDataService.get(player)

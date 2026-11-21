@@ -302,7 +302,7 @@ function HudController.Start()
 		StarterGui:SetCoreGuiEnabled(Enum.CoreGuiType.PlayerList, false)
 	end)
 	if not ok then
-		warn("[HudController] ซ่อน PlayerList ไม่สำเร็จ: {err}")
+		warn(`[HudController] ซ่อน PlayerList ไม่สำเร็จ: {err}`)
 	end
 	gui = UI.screenGui("CloudBakeryHud", 5)
 	buildCoins()

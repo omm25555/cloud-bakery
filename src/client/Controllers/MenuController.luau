@@ -7,6 +7,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 ReplicatedStorage:WaitForChild("Shared")
 local Shared = ReplicatedStorage.Shared
 local Config = Shared.Config
+local GameConfig = require(Config.Game)
 local Progression = require(Config.Progression)
 local Recipes = require(Config.Recipes)
 local Upgrades = require(Config.Upgrades)
@@ -209,6 +210,8 @@ local function upgradeEffect(lineId: string, level: number): string
 	return StateController.t("upgrade.CounterEffect", { value = math.floor(level * Upgrades.CounterTipBonusPerLevel * 100 + 0.5) })
 end
 
+local upgradeBusy = false
+
 renderers.Upgrade = function(body: ScrollingFrame, state: Types.PlayerState)
 	for index, lineId in Upgrades.Order do
 		local line = Upgrades.Lines[lineId]
@@ -231,8 +234,16 @@ renderers.Upgrade = function(body: ScrollingFrame, state: Types.PlayerState)
 			textSize = 16,
 		})
 		buy.Activated:Connect(function()
+			-- กันกดซ้ำ (ดับเบิลคลิก) ระหว่างรอ server ไม่ให้ซื้อสองเลเวลโดยไม่ตั้งใจ
+			if upgradeBusy then
+				return
+			end
+			upgradeBusy = true
 			local ok, result = pcall(function()
 				return Remotes.GetFunction("RequestUpgrade"):InvokeServer(lineId)
+			end)
+			task.delay(GameConfig.UpgradeClickCooldownSeconds, function()
+				upgradeBusy = false
 			end)
 			if not ok then
 				warn(`[MenuController] ขออัปเกรด {lineId} ไม่สำเร็จ: {result}`)

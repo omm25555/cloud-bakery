@@ -136,7 +136,7 @@ end
 local function makeBubble(root: BasePart): TextLabel
 	local gui = Instance.new("BillboardGui")
 	gui.Name = "OrderBubble"
-	gui.Size = UDim2.fromOffset(150, 56)
+	gui.Size = UDim2.fromScale(5, 1.9)
 	gui.StudsOffsetWorldSpace = Vector3.new(0, 6.4, 0)
 	gui.MaxDistance = 90
 	gui.Parent = root
@@ -232,6 +232,11 @@ local function serve(player: Player, customer: Customer)
 		return
 	end
 	if customer.leaving then
+		NotifyService.blocked(player, "n.orderTaken", { animal = `animal.{customer.order.animalId}` })
+		return
+	end
+	if WorldService.distanceTo(player, customer.root) > GameConfig.InteractMaxDistance then
+		NotifyService.rejected(SOURCE, player, "เสิร์ฟจากระยะไกลเกินไป", "n.tooFar")
 		return
 	end
 	local order = customer.order
@@ -405,6 +410,10 @@ function OrderService.Start()
 	Players.PlayerAdded:Connect(function(player: Player)
 		ordersEvent:FireClient(player, snapshot())
 	end)
+	-- ผู้เล่นที่เข้ามาก่อน Start ทำงาน (เช่น Play Solo) ต้องได้รายการออเดอร์ด้วย
+	for _, player in Players:GetPlayers() do
+		ordersEvent:FireClient(player, snapshot())
+	end
 
 	task.spawn(function()
 		task.wait(Customers.FirstSpawnDelaySeconds)
