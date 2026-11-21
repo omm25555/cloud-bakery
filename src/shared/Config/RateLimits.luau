@@ -22,6 +22,8 @@ local Config: RateLimitsConfig = {
 		BakeCollect = { Capacity = 4, RefillPerSecond = 2 },
 		BakeTap = { Capacity = 6, RefillPerSecond = 4 },
 		BakeSync = { Capacity = 2, RefillPerSecond = 0.2 },
+		ServeOrder = { Capacity = 3, RefillPerSecond = 1 },
+		ServeSync = { Capacity = 2, RefillPerSecond = 0.2 },
 	},
 	WarnCooldownSeconds = 5,
 	NotifyCooldownSeconds = 5,
