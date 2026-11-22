@@ -24,6 +24,8 @@ local Config: RateLimitsConfig = {
 		BakeSync = { Capacity = 2, RefillPerSecond = 0.2 },
 		ServeOrder = { Capacity = 3, RefillPerSecond = 1 },
 		ServeSync = { Capacity = 2, RefillPerSecond = 0.2 },
+		UpgradeBuy = { Capacity = 3, RefillPerSecond = 1 },
+		UpgradeSync = { Capacity = 2, RefillPerSecond = 0.2 },
 	},
 	WarnCooldownSeconds = 5,
 	NotifyCooldownSeconds = 5,

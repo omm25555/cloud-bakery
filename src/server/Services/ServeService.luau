@@ -18,6 +18,7 @@ local RateLimiter = require(ReplicatedStorage.Shared.RateLimiter)
 local Remotes = require(ReplicatedStorage.Shared.Remotes)
 local DataService = require(script.Parent.DataService)
 local NotifyService = require(script.Parent.NotifyService)
+local UpgradeService = require(script.Parent.UpgradeService)
 
 local LOG = "[ServeService]"
 
@@ -348,7 +349,7 @@ local function onServe(player: Player, orderIdRaw: unknown)
 	local ratio = math.clamp((order.ExpiresAt - now) / Serve.OrderTimeSeconds, 0, 1)
 	local hearts = heartsFor(ratio)
 	local multiplier = Serve.HeartCoinMultiplier[hearts] or 1
-	local coinGain = math.max(0, math.round(recipe.SellPrice * order.Amount * multiplier))
+	local coinGain = math.max(0, math.round(recipe.SellPrice * order.Amount * multiplier * UpgradeService.GetMultiplier(player, UpgradeService.Ids.CoinBonus)))
 	local repGain = math.max(0, Serve.ReputationBase + (Serve.ReputationHeartBonus[hearts] or 0))
 
 	local limits = PlayerDataConfig.Limits

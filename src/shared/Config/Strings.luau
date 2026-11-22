@@ -366,6 +366,66 @@ local Messages: { [string]: Entry } = {
 		th = "{dish} x{amount}\n{hearts}\nเหลือ {time}",
 		en = "{dish} x{amount}\n{hearts}\n{time} left",
 	},
+	UpgradeBuyOk = {
+		th = "อัปเกรด{line}เป็นเลเวล {level}/{max} แล้ว ({effect}) เหลือ {coins} เหรียญ",
+		en = "Upgraded {line} to level {level}/{max} ({effect}). {coins} coins left.",
+	},
+	UpgradeShort = {
+		th = "เหรียญไม่พอ ขาดอีก {missing} เหรียญ (ราคา {cost})",
+		en = "Not enough coins. You're {missing} short (cost {cost}).",
+	},
+	UpgradeMaxed = {
+		th = "อัปเกรดนี้เลเวลเต็มแล้ว",
+		en = "This upgrade is already at max level.",
+	},
+	UpgradeEffectTime = {
+		th = "เวลาลดลง {percent}%",
+		en = "{percent}% less time",
+	},
+	UpgradeEffectCoin = {
+		th = "เหรียญเพิ่ม {percent}%",
+		en = "{percent}% more coins",
+	},
+	UiUpgradeButton = {
+		th = "อัปเกรด",
+		en = "Upgrade",
+	},
+	UiUpgradeTitle = {
+		th = "อัปเกรดร้าน",
+		en = "Shop Upgrades",
+	},
+	UiUpgradeClose = {
+		th = "X",
+		en = "X",
+	},
+	UiUpgradeCoins = {
+		th = "เหรียญของคุณ: {coins}",
+		en = "Your coins: {coins}",
+	},
+	UiUpgradeLevel = {
+		th = "เลเวล {level}/{max}",
+		en = "Level {level}/{max}",
+	},
+	UiUpgradeEffectChange = {
+		th = "ตอนนี้: {now} → ถัดไป: {next}",
+		en = "Now: {now} → Next: {next}",
+	},
+	UiUpgradeEffectMax = {
+		th = "ตอนนี้: {now} (สูงสุด)",
+		en = "Now: {now} (max)",
+	},
+	UiUpgradeBuy = {
+		th = "ซื้อ {cost}",
+		en = "Buy {cost}",
+	},
+	UiUpgradeMaxedButton = {
+		th = "เต็มแล้ว",
+		en = "Maxed",
+	},
+	UiUpgradeLoading = {
+		th = "กำลังโหลด...",
+		en = "Loading...",
+	},
 	UiServeCurrency = {
 		th = "เหรียญ {coins}\nReputation {reputation}",
 		en = "Coins {coins}\nReputation {reputation}",

@@ -17,6 +17,7 @@ local RateLimiter = require(ReplicatedStorage.Shared.RateLimiter)
 local Remotes = require(ReplicatedStorage.Shared.Remotes)
 local DataService = require(script.Parent.DataService)
 local NotifyService = require(script.Parent.NotifyService)
+local UpgradeService = require(script.Parent.UpgradeService)
 
 local LOG = "[FarmService]"
 
@@ -186,7 +187,7 @@ local function onPlant(player: Player, plotIdRaw: unknown, cropIdRaw: unknown)
 	local now = Workspace:GetServerTimeNow()
 	plot.CropId = crop.Id
 	plot.PlantedAt = now
-	plot.ReadyAt = now + crop.GrowTimeSeconds
+	plot.ReadyAt = now + crop.GrowTimeSeconds * UpgradeService.GetMultiplier(player, UpgradeService.Ids.GrowthSpeed)
 	plot.PlantedBy = player.UserId
 
 	broadcastPlot(plot)
