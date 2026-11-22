@@ -63,10 +63,10 @@ local function refresh(state: MenuController.State)
 		return
 	end
 
-	for index, recipeId in MenuConfig.RecipeOrder do
+	for index, recipeId in MenuController.OrderIds(Recipes, MenuConfig.RecipeOrder) do
 		local recipe = Recipes[recipeId]
 		if recipe == nil then
-			warn(`{LOG} Config/Menu RecipeOrder มี id ที่ไม่มีใน Recipes: {recipeId}`)
+			warn(`{LOG} ไม่พบสูตร {recipeId} ใน Config/Recipes`)
 			continue
 		end
 		local card = MenuController.CreateColumn(container, index, true)

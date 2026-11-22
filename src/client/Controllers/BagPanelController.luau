@@ -72,7 +72,7 @@ local function refresh(state: MenuController.State)
 	local unknown: { string } = {}
 	for id, count in state.Inventory do
 		used += count
-		if itemName(id, state.Language) == nil then
+		if Ingredients[id] == nil and Recipes[id] == nil then
 			table.insert(unknown, id)
 			if not warnedUnknown[id] then
 				warnedUnknown[id] = true
@@ -84,8 +84,9 @@ local function refresh(state: MenuController.State)
 	local capacityArgs: { [string]: string | number } = { used = used, capacity = Farm.InventoryCapacity }
 	summary.Text = Strings.Format("UiBagCapacity", state.Language, capacityArgs)
 
-	local recipeIds: { string } = MenuConfig.RecipeOrder
-	local order = addSection(container, "UiBagSectionIngredients", MenuConfig.IngredientOrder, state, 2)
+	local ingredientIds = MenuController.OrderIds(Ingredients, MenuConfig.IngredientOrder)
+	local recipeIds = MenuController.OrderIds(Recipes, MenuConfig.RecipeOrder)
+	local order = addSection(container, "UiBagSectionIngredients", ingredientIds, state, 2)
 	order = addSection(container, "UiBagSectionBakes", recipeIds, state, order)
 	order = addSection(container, "UiBagSectionOther", unknown, state, order)
 	if order == 2 then

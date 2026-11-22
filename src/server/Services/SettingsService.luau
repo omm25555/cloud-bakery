@@ -100,7 +100,8 @@ local function onSetLanguage(player: Player, raw: unknown)
 	end
 
 	-- จากตรงนี้ถึงเขียนข้อมูลไม่มี yield
-	data.Settings.Language = language
+	local chosen: Language = if language == "en" then "en" else "th"
+	data.Settings.Language = chosen
 	settingsStateEvent:FireClient(player, { Language = language })
 	InventoryService.Send(player, data)
 	upgradeStateEvent:FireClient(player, { Levels = buildLevels(data), Language = language })

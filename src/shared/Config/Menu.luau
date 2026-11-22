@@ -60,7 +60,11 @@ return {
 	-- แผง: กรอบมนสีครีม หัวการ์ดม่วงเข้ม
 	PanelWidthPixels = 440,
 	PanelWidthScale = 0.94,
-	PanelMaxHeightPixels = 560,
+	PanelMaxHeightPixels = 560, -- เพดานความสูงแผง (จอเล็กใช้ค่าจากความสูงจอแทนถ้าน้อยกว่า)
+	PanelTopMarginPixels = 8, -- ระยะเว้นขอบบนจอ
+	PanelMinScrollHeightPixels = 80, -- พื้นที่เลื่อนต่ำสุดแม้จอเตี้ยมาก
+	ScrollBarThicknessPixels = 6,
+	ScrollBarColor = Color3.fromRGB(120, 100, 180),
 	PanelBottomOffsetPixels = 70,
 	PanelPaddingPixels = 12,
 	PanelSpacingPixels = 8,

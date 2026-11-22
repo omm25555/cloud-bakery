@@ -33,6 +33,8 @@ export type Panel = {
 type PanelView = {
 	Panel: Panel,
 	Frame: Frame,
+	Scroll: ScrollingFrame,
+	Content: Frame,
 	TitleLabel: TextLabel,
 	SubTitleLabel: TextLabel,
 	CloseButton: TextButton,
@@ -52,6 +54,13 @@ local panelViews: { [string]: PanelView } = {}
 local openPanelId: string? = nil
 local lockedEvent: RemoteEvent? = nil
 
+local function parseLanguage(value: string): string?
+	if value == "th" or value == "en" then
+		return value
+	end
+	return nil
+end
+
 local function text(key: string): string
 	return Strings.Format(key, state.Language, nil)
 end
@@ -68,6 +77,22 @@ end
 
 function MenuController.GetState(): State
 	return state
+end
+
+-- จำกัดความสูงแผงตามความสูงจอ: หัวการ์ดคงที่ เนื้อหาเลื่อนได้ในพื้นที่ที่เหลือ
+local function updatePanelHeight(view: PanelView)
+	local gui = root
+	if gui == nil then
+		return
+	end
+	local available = gui.AbsoluteSize.Y
+		- Upgrades.ButtonMarginPixels
+		- MenuConfig.PanelBottomOffsetPixels
+		- MenuConfig.PanelTopMarginPixels
+	local maxPanel = math.min(MenuConfig.PanelMaxHeightPixels, available)
+	local maxScroll = math.max(maxPanel - MenuConfig.HeaderHeightPixels, MenuConfig.PanelMinScrollHeightPixels)
+	local wanted = math.min(view.Content.AbsoluteSize.Y, maxScroll)
+	view.Scroll.Size = UDim2.new(1, 0, 0, wanted)
 end
 
 local function refreshPanel(view: PanelView)
@@ -109,6 +134,7 @@ local function togglePanel(id: string)
 		openPanelId = id
 		view.Frame.Visible = true
 		refreshPanel(view)
+		updatePanelHeight(view)
 	end
 end
 
@@ -199,7 +225,7 @@ local function createPanelFrame(gui: ScreenGui, panel: Panel): PanelView
 	frame.Parent = gui
 	addCorner(frame, MenuConfig.CornerRadiusPixels)
 	local sizeLimit = Instance.new("UISizeConstraint")
-	sizeLimit.MaxSize = Vector2.new(MenuConfig.PanelWidthPixels, MenuConfig.PanelMaxHeightPixels)
+	sizeLimit.MaxSize = Vector2.new(MenuConfig.PanelWidthPixels, math.huge)
 	sizeLimit.Parent = frame
 	local layout = Instance.new("UIListLayout")
 	layout.SortOrder = Enum.SortOrder.LayoutOrder
@@ -248,13 +274,25 @@ local function createPanelFrame(gui: ScreenGui, panel: Panel): PanelView
 	close.Parent = header
 	addCorner(close, MenuConfig.CornerRadiusPixels)
 
+	local scroll = Instance.new("ScrollingFrame")
+	scroll.Name = "Scroll"
+	scroll.LayoutOrder = 1
+	scroll.Size = UDim2.new(1, 0, 0, 0)
+	scroll.BackgroundTransparency = 1
+	scroll.BorderSizePixel = 0
+	scroll.CanvasSize = UDim2.new(0, 0, 0, 0)
+	scroll.AutomaticCanvasSize = Enum.AutomaticSize.Y
+	scroll.ScrollingDirection = Enum.ScrollingDirection.Y
+	scroll.ScrollBarThickness = MenuConfig.ScrollBarThicknessPixels
+	scroll.ScrollBarImageColor3 = MenuConfig.ScrollBarColor
+	scroll.Parent = frame
+
 	local content = Instance.new("Frame")
 	content.Name = "Content"
-	content.LayoutOrder = 1
 	content.Size = UDim2.new(1, 0, 0, 0)
 	content.AutomaticSize = Enum.AutomaticSize.Y
 	content.BackgroundTransparency = 1
-	content.Parent = frame
+	content.Parent = scroll
 	local padding = Instance.new("UIPadding")
 	padding.PaddingTop = UDim.new(0, MenuConfig.PanelPaddingPixels)
 	padding.PaddingBottom = UDim.new(0, MenuConfig.PanelPaddingPixels)
@@ -264,20 +302,35 @@ local function createPanelFrame(gui: ScreenGui, panel: Panel): PanelView
 
 	panel.Build(content)
 
+	local view: PanelView = {
+		Panel = panel,
+		Frame = frame,
+		Scroll = scroll,
+		Content = content,
+		TitleLabel = titleLabel,
+		SubTitleLabel = subTitleLabel,
+		CloseButton = close,
+	}
 	table.insert(
 		connections,
 		close.Activated:Connect(function()
 			closePanels()
 		end)
 	)
-
-	return {
-		Panel = panel,
-		Frame = frame,
-		TitleLabel = titleLabel,
-		SubTitleLabel = subTitleLabel,
-		CloseButton = close,
-	}
+	table.insert(
+		connections,
+		content:GetPropertyChangedSignal("AbsoluteSize"):Connect(function()
+			updatePanelHeight(view)
+		end)
+	)
+	table.insert(
+		connections,
+		gui:GetPropertyChangedSignal("AbsoluteSize"):Connect(function()
+			updatePanelHeight(view)
+		end)
+	)
+	updatePanelHeight(view)
+	return view
 end
 
 function MenuController.RegisterPanel(panel: Panel)
@@ -337,6 +390,29 @@ function MenuController.CreateColumn(parent: Instance, order: number, filled: bo
 	return frame
 end
 
+-- เรียง id ทั้งหมดใน known: ตาม preferred ก่อน แล้วต่อท้ายตัวที่เหลือเรียงตาม id (ไม่ทิ้ง id ใดเงียบ ๆ)
+function MenuController.OrderIds<T>(known: { [string]: T }, preferred: { string }): { string }
+	local ids: { string } = {}
+	local seen: { [string]: boolean } = {}
+	for _, id in preferred do
+		if known[id] ~= nil and not seen[id] then
+			table.insert(ids, id)
+			seen[id] = true
+		end
+	end
+	local rest: { string } = {}
+	for id in known do
+		if not seen[id] then
+			table.insert(rest, id)
+		end
+	end
+	table.sort(rest)
+	for _, id in rest do
+		table.insert(ids, id)
+	end
+	return ids
+end
+
 local function onInventoryUpdate(payload: unknown)
 	if type(payload) ~= "table" then
 		warn(`{LOG} InventoryUpdate payload ไม่ถูกต้อง ข้าม`)
@@ -344,7 +420,12 @@ local function onInventoryUpdate(payload: unknown)
 	end
 	local data = payload :: { [string]: unknown }
 	if type(data.Language) == "string" then
-		state.Language = data.Language :: string
+		local language = parseLanguage(data.Language :: string)
+		if language then
+			state.Language = language
+		else
+			warn(`{LOG} InventoryUpdate Language ไม่ถูกต้อง ไม่เปลี่ยนภาษา`)
+		end
 	end
 	local raw = data.Inventory
 	if type(raw) ~= "table" then
@@ -372,7 +453,12 @@ local function onSettingsState(payload: unknown)
 		warn(`{LOG} SettingsState ไม่มี Language ข้าม`)
 		return
 	end
-	state.Language = language :: string
+	local valid = parseLanguage(language :: string)
+	if valid == nil then
+		warn(`{LOG} SettingsState Language ไม่ถูกต้อง ไม่เปลี่ยนภาษา`)
+		return
+	end
+	state.Language = valid
 	refreshAll()
 end
 
