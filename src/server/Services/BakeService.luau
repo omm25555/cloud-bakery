@@ -21,6 +21,7 @@ local RateLimiter = require(ReplicatedStorage.Shared.RateLimiter)
 local Remotes = require(ReplicatedStorage.Shared.Remotes)
 local DataService = require(script.Parent.DataService)
 local NotifyService = require(script.Parent.NotifyService)
+local UpgradeService = require(script.Parent.UpgradeService)
 
 local LOG = "[BakeService]"
 
@@ -580,15 +581,16 @@ local function onStart(player: Player, recipeIdRaw: unknown)
 	freeOven.RecipeId = recipe.Id
 	freeOven.OwnerUserId = player.UserId
 	freeOven.OwnerName = player.DisplayName
-	freeOven.ReadyAt = now + recipe.BakeTimeSeconds
+	local bakeSeconds = recipe.BakeTimeSeconds * UpgradeService.GetMultiplier(player, UpgradeService.Ids.OvenSpeed)
+	freeOven.ReadyAt = now + bakeSeconds
 	freeOven.Minigame = nil
 	freeOven.Grade = nil
 	freeOven.Amount = nil
-	beginWait(freeOven, now + recipe.BakeTimeSeconds)
+	beginWait(freeOven, now + bakeSeconds)
 
 	broadcastOven(freeOven)
 	sendInventory(player, data)
-	local okArgs: { [string]: string | number } = { dish = dishName(player, recipe.Id), seconds = recipe.BakeTimeSeconds }
+	local okArgs: { [string]: string | number } = { dish = dishName(player, recipe.Id), seconds = math.ceil(bakeSeconds) }
 	NotifyService.Notify(player, "BakeStartOk", "success", okArgs)
 end
 
