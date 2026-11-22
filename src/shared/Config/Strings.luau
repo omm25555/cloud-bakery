@@ -430,6 +430,98 @@ local Messages: { [string]: Entry } = {
 		th = "เหรียญ {coins}\nReputation {reputation}",
 		en = "Coins {coins}\nReputation {reputation}",
 	},
+	UiMenuBag = {
+		th = "กระเป๋า",
+		en = "Bag",
+	},
+	UiMenuRecipes = {
+		th = "สูตร",
+		en = "Recipes",
+	},
+	UiMenuPets = {
+		th = "สัตว์เลี้ยง 🔒",
+		en = "Pets 🔒",
+	},
+	UiMenuDecor = {
+		th = "ตกแต่ง 🔒",
+		en = "Decor 🔒",
+	},
+	UiMenuSettings = {
+		th = "ตั้งค่า",
+		en = "Settings",
+	},
+	UiMenuClose = {
+		th = "X",
+		en = "X",
+	},
+	UiMenuLoading = {
+		th = "กำลังโหลด...",
+		en = "Loading...",
+	},
+	UiBagCapacity = {
+		th = "ใช้ {used}/{capacity}",
+		en = "Used {used}/{capacity}",
+	},
+	UiBagEmpty = {
+		th = "กระเป๋าว่าง",
+		en = "Your bag is empty",
+	},
+	UiBagSectionIngredients = {
+		th = "วัตถุดิบ",
+		en = "Ingredients",
+	},
+	UiBagSectionBakes = {
+		th = "ขนมอบ",
+		en = "Baked goods",
+	},
+	UiBagSectionOther = {
+		th = "อื่น ๆ",
+		en = "Other",
+	},
+	UiRecipesTitle = {
+		th = "สูตรขนม",
+		en = "Recipes",
+	},
+	UiRecipeNameBoth = {
+		th = "{nameTh} ({nameEn})",
+		en = "{nameEn} ({nameTh})",
+	},
+	UiRecipeNeed = {
+		th = "{name} ต้องใช้ {need} (มี {have})",
+		en = "{name}: need {need} (have {have})",
+	},
+	UiRecipeEnough = {
+		th = "มีพอ",
+		en = "Ready to bake",
+	},
+	UiRecipeShort = {
+		th = "ไม่พอ",
+		en = "Not enough",
+	},
+	UiRecipeTime = {
+		th = "เวลาอบ {seconds} วินาที (ยังไม่รวมอัปเกรด)",
+		en = "Bake time {seconds}s (before upgrades)",
+	},
+	UiSettingsTitle = {
+		th = "ตั้งค่า",
+		en = "Settings",
+	},
+	UiSettingsLanguage = {
+		th = "ภาษา (Language)",
+		en = "Language (ภาษา)",
+	},
+	LanguageChanged = {
+		th = "เปลี่ยนภาษาเป็น {language} แล้ว",
+		en = "Language changed to {language}.",
+	},
+	LanguageSame = {
+		th = "ใช้ภาษา {language} อยู่แล้ว",
+		en = "You're already using {language}.",
+	},
+	ComingSoon = {
+		th = "เร็วๆ นี้ (Coming soon)",
+		en = "Coming soon!",
+	},
 }
 
 local Strings = {}
