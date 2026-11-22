@@ -302,6 +302,74 @@ local Messages: { [string]: Entry } = {
 		th = "Miss",
 		en = "Miss",
 	},
+	ServeNewCustomer = {
+		th = "ลูกค้าใหม่: {customer}สั่ง{dish} x{amount}",
+		en = "New customer: {customer} ordered {amount} x {dish}.",
+	},
+	ServeOk = {
+		th = "เสิร์ฟ{dish} x{amount} ให้{customer}แล้ว ได้ {coins} เหรียญ +{reputation} Reputation ({hearts} หัวใจ)",
+		en = "Served {amount} x {dish} to {customer}. Got {coins} coins, +{reputation} Reputation ({hearts} hearts).",
+	},
+	ServeServedBy = {
+		th = "{player}เสิร์ฟ{customer}ไปแล้ว",
+		en = "{player} served {customer}.",
+	},
+	ServeMissingItems = {
+		th = "ขนมไม่พอ ขาด{dish}อีก {count} ชิ้น",
+		en = "Not enough baked goods. Missing {count} x {dish}.",
+	},
+	ServeOrderGone = {
+		th = "ออเดอร์นี้ไม่มีแล้ว (ถูกเสิร์ฟไปแล้วหรือลูกค้ากลับไปแล้ว)",
+		en = "That order is gone (already served, or the customer left).",
+	},
+	ServeTooFar = {
+		th = "อยู่ไกลลูกค้าเกินไป เดินเข้าไปใกล้ ๆ ก่อน",
+		en = "You're too far from the customer. Move closer.",
+	},
+	ServeCoinsCapped = {
+		th = "เหรียญเต็มเพดานแล้ว ได้เพิ่มแค่ {coins} เหรียญ",
+		en = "Your coins are at the cap. Only {coins} coins were added.",
+	},
+	ServeReputationCapped = {
+		th = "Reputation เต็มเพดานแล้ว ได้เพิ่มแค่ {reputation}",
+		en = "Your Reputation is at the cap. Only {reputation} was added.",
+	},
+	ServeOrderWarn = {
+		th = "{customer}รอ{dish}อยู่ เหลืออีก {seconds} วินาที",
+		en = "{customer} is waiting for {dish}. {seconds} seconds left.",
+	},
+	ServeOrderExpired = {
+		th = "{customer}รอนานเกินไปและกลับไปแล้ว",
+		en = "{customer} waited too long and left.",
+	},
+	ServeReputationLost = {
+		th = "ลูกค้ากลับไป Reputation ลด {reputation}",
+		en = "A customer left. Reputation decreased by {reputation}.",
+	},
+	UiServeCounterLabel = {
+		th = "เคาน์เตอร์รับออเดอร์",
+		en = "Order counter",
+	},
+	UiServeTableLabel = {
+		th = "โต๊ะเสิร์ฟ",
+		en = "Serving table",
+	},
+	UiServeLoadFailed = {
+		th = "ระบบเสิร์ฟโหลดไม่สำเร็จ ลองเข้าเกมใหม่",
+		en = "Serving failed to load. Please rejoin the game.",
+	},
+	UiServePromptAction = {
+		th = "เสิร์ฟ",
+		en = "Serve",
+	},
+	UiServeBubble = {
+		th = "{dish} x{amount}\n{hearts}\nเหลือ {time}",
+		en = "{dish} x{amount}\n{hearts}\n{time} left",
+	},
+	UiServeCurrency = {
+		th = "เหรียญ {coins}\nReputation {reputation}",
+		en = "Coins {coins}\nReputation {reputation}",
+	},
 }
 
 local Strings = {}
