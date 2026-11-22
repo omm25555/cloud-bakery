@@ -32,7 +32,6 @@ local coins = 0
 local language = "th"
 local stateKnown = false
 
-local panel: Frame? = nil
 local openButton: TextButton? = nil
 local badge: Frame? = nil
 local coinsLabel: TextLabel? = nil
@@ -78,6 +77,11 @@ local function levelOf(lineId: string): number
 	return levels[lineId] or 0
 end
 
+local function isBuyable(line: Upgrades.Line): boolean
+	local cost = UpgradeRules.Cost(line, levelOf(line.Id) + 1)
+	return stateKnown and cost ~= nil and coins >= cost
+end
+
 local function refresh()
 	local anyBuyable = false
 	for _, row in rows do
@@ -88,7 +92,7 @@ local function refresh()
 		local level = levelOf(row.LineId)
 		local maxLevel = UpgradeRules.MaxLevel(line)
 		local cost = UpgradeRules.Cost(line, level + 1)
-		local buyable = stateKnown and cost ~= nil and coins >= cost
+		local buyable = isBuyable(line)
 		if buyable then
 			anyBuyable = true
 		end
@@ -143,6 +147,10 @@ end
 local function onBuyClicked(lineId: string)
 	local event = buyEvent
 	if event == nil then
+		return
+	end
+	local line = Upgrades.Lines[lineId]
+	if line == nil or not isBuyable(line) then
 		return
 	end
 	event:FireServer(lineId)
@@ -268,7 +276,6 @@ local function createGui(playerGui: PlayerGui)
 	layout.HorizontalAlignment = Enum.HorizontalAlignment.Center
 	layout.Padding = UDim.new(0, Upgrades.PanelSpacingPixels)
 	layout.Parent = frame
-	panel = frame
 
 	local header = Instance.new("Frame")
 	header.Name = "Header"
