@@ -288,7 +288,7 @@ local function createRow(questId: string, nameKey: string, order: number, scroll
 	checkCorner.Parent = check
 	local checkStroke = Instance.new("UIStroke")
 	checkStroke.Color = QuestsConfig.SubTextColor
-	checkStroke.Thickness = 1
+	checkStroke.Thickness = QuestsConfig.CheckStrokeThicknessPixels
 	checkStroke.Parent = check
 	check.Parent = frame
 

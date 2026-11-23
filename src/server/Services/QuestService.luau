@@ -161,7 +161,9 @@ function QuestService.Record(player: Player, kind: string, id: string, amount: n
 		warn(`{LOG} Record ({kind} {id}) ของ {player.Name}: amount "{tostring(amount)}" ไม่ใช่จำนวนเต็มบวกในช่วงที่รับได้ ข้าม`)
 		return
 	end
-	local ok, err = pcall(recordUnsafe, player, kind, id, amount)
+	local ok, err = pcall(function()
+		recordUnsafe(player, kind, id, amount)
+	end)
 	if not ok then
 		warn(`{LOG} Record ({kind} {id} x{amount}) ของ {player.Name} error: {tostring(err)}`)
 	end
@@ -293,7 +295,7 @@ local function warnExpiring(player: Player, data: PlayerData)
 		local progress = QuestRules.ClampProgress(quests.Progress[quest.Id] or 0, quest.Target)
 		if progress >= quest.Target and quests.Claimed[quest.Id] ~= true then
 			expiryWarned[player] = quests.Day
-			local args: { [string]: string | number } = { minutes = math.max(1, math.ceil(remaining / 60)) }
+			local args: { [string]: string | number } = { minutes = math.max(1, math.ceil(remaining / QuestsConfig.SecondsPerMinute)) }
 			NotifyService.Notify(player, "QuestExpiring", "info", args)
 			return
 		end
@@ -316,7 +318,9 @@ local function tickLoop()
 	while true do
 		task.wait(QuestsConfig.TickSeconds)
 		for _, player in Players:GetPlayers() do
-			local ok, err = pcall(checkPlayer, player)
+			local ok, err = pcall(function()
+				checkPlayer(player)
+			end)
 			if not ok then
 				warn(`{LOG} ตรวจวันใหม่ของ {player.Name} error: {tostring(err)}`)
 			end

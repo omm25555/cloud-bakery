@@ -73,6 +73,7 @@ return {
 	SyncWaitSeconds = 30,
 	SyncPollSeconds = 0.5,
 	TickSeconds = 15,
+	SecondsPerMinute = 60,
 	ExpiryWarnSeconds = 300, -- เตือนเควสที่ครบแล้วแต่ยังไม่รับ เมื่อเหลือเวลาก่อนรีเซ็ตเท่านี้
 
 	-- client: ขอข้อมูลซ้ำ 1 ครั้งที่ LoadRetrySeconds แล้วขึ้น "โหลดไม่สำเร็จ" ที่ LoadTimeoutSeconds
@@ -111,6 +112,7 @@ return {
 	RowPaddingPixels = 5,
 	CheckboxSizePixels = 22,
 	CheckboxGapPixels = 6,
+	CheckStrokeThicknessPixels = 1,
 	LineHeightPixels = 18,
 	BarTopPixels = 22,
 	BarHeightPixels = 8,
