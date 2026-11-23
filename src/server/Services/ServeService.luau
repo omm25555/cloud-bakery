@@ -375,7 +375,9 @@ local function onServe(player: Player, orderIdRaw: unknown)
 	sendCurrency(player, data)
 	QuestService.Record(player, QuestService.Kinds.Serve, order.RecipeId, 1)
 	-- โบนัสผู้ช่วย co-op (TASK-010): ล้มเหลวต้องไม่กระทบการเสิร์ฟที่จบแล้ว
-	local coopOk, coopErr = pcall(CoopService.OnServed, player, order.RecipeId, order.Amount, coinsAdded)
+	local coopOk, coopErr = pcall(function()
+		CoopService.OnServed(player, order.RecipeId, order.Amount, coinsAdded)
+	end)
 	if not coopOk then
 		warn(`{LOG} {player.Name} CoopService.OnServed ล้มเหลว: {coopErr}`)
 	end

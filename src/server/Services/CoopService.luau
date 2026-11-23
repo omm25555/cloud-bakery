@@ -171,8 +171,12 @@ local function countOffers(player: Player, asSender: boolean): number
 	return count
 end
 
+local function playerArgs(name: string): { [string]: string | number }
+	return { player = name }
+end
+
 local function currentDay(): number
-	return math.floor(os.time() / Coop.DaySeconds)
+	return math.floor((os.time() + Coop.ResetOffsetSeconds) / Coop.DaySeconds)
 end
 
 local function bonusDayOf(userId: number): BonusDay
@@ -424,7 +428,7 @@ local function onRespond(player: Player, offerIdRaw: unknown, acceptRaw: unknown
 	local language = languageOf(player)
 
 	if acceptRaw == false then
-		NotifyService.Notify(player, "CoopDeclinedSelf", "info", { player = giver.DisplayName })
+		NotifyService.Notify(player, "CoopDeclinedSelf", "info", playerArgs(giver.DisplayName))
 		if giver.Parent == Players then
 			NotifyService.Notify(giver, "CoopDeclinedGiver", "info", offerArgs(languageOf(giver), player.DisplayName, offer))
 		end
@@ -440,7 +444,7 @@ local function onRespond(player: Player, offerIdRaw: unknown, acceptRaw: unknown
 	local data = DataService.GetData(player)
 	if giverData == nil then
 		warn(`{LOG} คำขอ {offer.Id} ยกเลิก: ผู้ให้ {giver.Name} ออกจากเกมหรือข้อมูลไม่พร้อม`)
-		NotifyService.Notify(player, "CoopGiverLeft", "error", { player = giver.DisplayName })
+		NotifyService.Notify(player, "CoopGiverLeft", "error", playerArgs(giver.DisplayName))
 		return
 	end
 	if data == nil then
@@ -450,26 +454,28 @@ local function onRespond(player: Player, offerIdRaw: unknown, acceptRaw: unknown
 	if not isNearEachOther(player, giver) then
 		local args: { [string]: string | number } = { player = giver.DisplayName }
 		reject(player, "CoopRespond", `อยู่ไกล {giver.Name} เกินระยะตอนกดรับ`, "CoopTooFar", args)
-		NotifyService.Notify(giver, "CoopTooFar", "error", { player = player.DisplayName })
+		NotifyService.Notify(giver, "CoopTooFar", "error", playerArgs(player.DisplayName))
 		return
 	end
 	local have = giverData.Inventory[offer.ItemId] or 0
 	if have < offer.Amount then
 		warn(`{LOG} คำขอ {offer.Id} ล้มเหลว: {giver.Name} มี {offer.ItemId} {have}/{offer.Amount}`)
-		NotifyService.Notify(player, "CoopGiverNotEnough", "error", {
+		local selfArgs: { [string]: string | number } = {
 			player = giver.DisplayName,
 			item = itemName(language, offer.ItemId),
-		})
-		NotifyService.Notify(giver, "CoopNotEnough", "error", {
+		}
+		local giverArgs: { [string]: string | number } = {
 			item = itemName(languageOf(giver), offer.ItemId),
 			count = offer.Amount,
-		})
+		}
+		NotifyService.Notify(player, "CoopGiverNotEnough", "error", selfArgs)
+		NotifyService.Notify(giver, "CoopNotEnough", "error", giverArgs)
 		return
 	end
 	if not hasRoom(data, offer.ItemId, offer.Amount) then
 		warn(`{LOG} คำขอ {offer.Id} ล้มเหลว: กระเป๋า {player.Name} เต็ม`)
 		NotifyService.Notify(player, "CoopReceiverFullSelf", "error", offerArgs(language, giver.DisplayName, offer))
-		NotifyService.Notify(giver, "CoopReceiverFull", "error", { player = player.DisplayName })
+		NotifyService.Notify(giver, "CoopReceiverFull", "error", playerArgs(player.DisplayName))
 		return
 	end
 
@@ -514,15 +520,16 @@ local function onPlayerRemoving(player: Player)
 		if offer.From == player then
 			warn(`{LOG} {player.Name} (ผู้ให้) ออกจากเกม ยกเลิกคำขอ {offer.Id}`)
 			if offer.To.Parent == Players then
-				NotifyService.Notify(offer.To, "CoopGiverLeft", "info", { player = player.DisplayName })
+				NotifyService.Notify(offer.To, "CoopGiverLeft", "info", playerArgs(player.DisplayName))
 			end
 		else
 			warn(`{LOG} {player.Name} (ผู้รับ) ออกจากเกม ยกเลิกคำขอ {offer.Id}`)
 			if offer.From.Parent == Players then
-				NotifyService.Notify(offer.From, "CoopTargetLeft", "info", { player = player.DisplayName })
+				NotifyService.Notify(offer.From, "CoopTargetLeft", "info", playerArgs(player.DisplayName))
 			end
 		end
 	end
+	limiter:Remove(player)
 	if credits[player] ~= nil then
 		credits[player] = nil
 	end

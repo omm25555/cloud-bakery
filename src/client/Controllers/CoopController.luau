@@ -137,7 +137,8 @@ local function refreshSend()
 	if target == nil then
 		return
 	end
-	title.Text = text("UiCoopTitle", { player = target.DisplayName })
+	local titleArgs: { [string]: string | number } = { player = target.DisplayName }
+	title.Text = text("UiCoopTitle", titleArgs)
 
 	for _, child in list:GetChildren() do
 		if child:IsA("TextButton") then
@@ -169,7 +170,8 @@ local function refreshSend()
 		local button = makeButton(list, if id == current then Coop.ButtonSelectedColor else Coop.ButtonColor)
 		button.LayoutOrder = index
 		button.Size = UDim2.new(1, 0, 0, Coop.RowHeightPixels)
-		button.Text = text("UiCoopItem", { name = itemName(id), count = inventory[id] or 0 })
+		local itemArgs: { [string]: string | number } = { name = itemName(id), count = inventory[id] or 0 }
+		button.Text = text("UiCoopItem", itemArgs)
 		-- ปุ่มถูก Destroy ตอนวาดใหม่ การเชื่อมต่อจึงถูกตัดอัตโนมัติ
 		button.Activated:Connect(function()
 			selectedItem = id
@@ -182,7 +184,8 @@ local function refreshSend()
 
 	local maxAmount = if current then math.min(Coop.MaxItemsPerGift, inventory[current] or 0) else 0
 	selectedAmount = math.clamp(selectedAmount, 1, math.max(1, maxAmount))
-	amountText.Text = text("UiCoopAmount", { count = selectedAmount })
+	local amountArgs: { [string]: string | number } = { count = selectedAmount }
+	amountText.Text = if current == nil then text("UiCoopSelectItem", nil) else text("UiCoopAmount", amountArgs)
 	send.Visible = current ~= nil
 	send.Text = text("UiCoopSend", nil)
 	cancel.Text = text("UiCoopCancel", nil)
@@ -332,8 +335,10 @@ local function refreshOffer()
 		frame.Visible = false
 		return
 	end
-	title.Text = text("UiCoopOfferTitle", { player = offer.FromName })
-	body.Text = text("UiCoopOfferBody", { name = itemName(offer.ItemId), count = offer.Amount })
+	local titleArgs: { [string]: string | number } = { player = offer.FromName }
+	local bodyArgs: { [string]: string | number } = { name = itemName(offer.ItemId), count = offer.Amount }
+	title.Text = text("UiCoopOfferTitle", titleArgs)
+	body.Text = text("UiCoopOfferBody", bodyArgs)
 	frame.Visible = true
 	for _, child in frame:GetChildren() do
 		if child:IsA("Frame") then
@@ -597,6 +602,7 @@ function CoopController.Start()
 	buildOfferBox(root)
 
 	table.insert(connections, Remotes.GetEvent("InventoryUpdate").OnClientEvent:Connect(onInventoryUpdate))
+	Remotes.GetEvent("InventorySync"):FireServer()
 	table.insert(connections, Remotes.GetEvent("CoopState").OnClientEvent:Connect(onState))
 	table.insert(connections, Players.PlayerAdded:Connect(attachPlayer))
 	table.insert(connections, Players.PlayerRemoving:Connect(detachPlayer))

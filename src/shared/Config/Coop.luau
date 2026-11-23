@@ -27,6 +27,7 @@ return {
 	GiftCreditSeconds = 600, -- เครดิตขนมที่ได้รับหมดอายุเมื่อไม่ถูกใช้เสิร์ฟ
 	MaxCreditsPerPlayer = 20, -- จำนวนเครดิตสูงสุดที่เก็บต่อผู้รับ
 	DaySeconds = 86400,
+	ResetOffsetSeconds = 25200, -- ให้ตรงกับ Quests.ResetOffsetSeconds (รีเซ็ตเที่ยงคืนเวลาไทย)
 
 	-- client: ปุ่มกดที่ตัวผู้เล่นอื่น (ProximityPrompt) เพื่อเปิดแผงให้ของ
 	PromptName = "CoopGivePrompt",
