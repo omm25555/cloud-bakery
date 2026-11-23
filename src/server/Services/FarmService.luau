@@ -18,6 +18,7 @@ local Remotes = require(ReplicatedStorage.Shared.Remotes)
 local DataService = require(script.Parent.DataService)
 local NotifyService = require(script.Parent.NotifyService)
 local UpgradeService = require(script.Parent.UpgradeService)
+local QuestService = require(script.Parent.QuestService)
 
 local LOG = "[FarmService]"
 
@@ -255,6 +256,7 @@ local function onHarvest(player: Player, plotIdRaw: unknown)
 
 	broadcastPlot(plot)
 	sendInventory(player, data)
+	QuestService.Record(player, QuestService.Kinds.Harvest, crop.IngredientId, amount)
 	local okArgs: { [string]: string | number } = { crop = cropName(player, cropId), amount = amount }
 	NotifyService.Notify(player, "HarvestOk", "success", okArgs)
 

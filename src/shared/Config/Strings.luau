@@ -570,6 +570,90 @@ local Messages: { [string]: Entry } = {
 		th = "Reputation เลเวลลดลงเป็นเลเวล {level}",
 		en = "Reputation level dropped to Lv {level}.",
 	},
+	QuestHarvestWheat = {
+		th = "เก็บข้าวสาลี {target}",
+		en = "Harvest {target} Wheat",
+	},
+	QuestBakeCloudBread = {
+		th = "อบขนมปังเมฆ {target}",
+		en = "Bake {target} Cloud Bread",
+	},
+	QuestServeOrders = {
+		th = "เสิร์ฟ {target} ออเดอร์",
+		en = "Serve {target} orders",
+	},
+	UiQuestTitle = {
+		th = "เควสประจำวัน",
+		en = "Daily Quests",
+	},
+	UiQuestTitleCount = {
+		th = "เควสประจำวัน {done}/{total}",
+		en = "Daily Quests {done}/{total}",
+	},
+	UiQuestReset = {
+		th = "รีเซ็ตใน {time}",
+		en = "Resets in {time}",
+	},
+	UiQuestLoadFailed = {
+		th = "โหลดเควสไม่สำเร็จ ลองออกแล้วเข้าเกมใหม่",
+		en = "Couldn't load quests. Please rejoin.",
+	},
+	UiQuestProgress = {
+		th = "{progress}/{target}",
+		en = "{progress}/{target}",
+	},
+	UiQuestReward = {
+		th = "รางวัล {coins} เหรียญ",
+		en = "Reward: {coins} coins",
+	},
+	UiQuestRewardRep = {
+		th = "รางวัล {coins} เหรียญ + {reputation} Rep",
+		en = "Reward: {coins} coins + {reputation} Rep",
+	},
+	UiQuestClaim = {
+		th = "รับรางวัล",
+		en = "Claim",
+	},
+	UiQuestClaimed = {
+		th = "รับแล้ว",
+		en = "Claimed",
+	},
+	QuestComplete = {
+		th = "เควสสำเร็จ: {quest} กดรับรางวัลได้ที่แผงเควส",
+		en = "Quest complete: {quest}. Claim your reward in the quest panel!",
+	},
+	QuestClaimOk = {
+		th = "รับรางวัลเควส {quest}: +{coins} เหรียญ",
+		en = "Quest reward ({quest}): +{coins} coins",
+	},
+	QuestClaimOkRep = {
+		th = "รับรางวัลเควส {quest}: +{coins} เหรียญ +{reputation} Reputation",
+		en = "Quest reward ({quest}): +{coins} coins, +{reputation} Reputation",
+	},
+	QuestRewardCapped = {
+		th = "ค่าสะสมเต็มเพดานแล้ว จึงได้รางวัลไม่ครบ",
+		en = "You reached the cap, so part of the reward was not added.",
+	},
+	QuestNotComplete = {
+		th = "เควส {quest} ยังไม่สำเร็จ ({progress}/{target})",
+		en = "Quest not complete yet: {quest} ({progress}/{target})",
+	},
+	QuestAlreadyClaimed = {
+		th = "คุณรับรางวัลเควส {quest} ไปแล้ววันนี้",
+		en = "You already claimed the reward for {quest} today.",
+	},
+	QuestDayChanged = {
+		th = "ข้ามวันใหม่แล้ว เควสถูกรีเซ็ต กรุณาดูเควสชุดใหม่",
+		en = "A new day started and quests were reset. Please check the new quests.",
+	},
+	QuestNewDay = {
+		th = "วันใหม่แล้ว! มีเควสประจำวันชุดใหม่",
+		en = "A new day! New daily quests are available.",
+	},
+	QuestExpiring = {
+		th = "มีเควสที่สำเร็จแล้วแต่ยังไม่ได้รับรางวัล เควสจะรีเซ็ตใน {minutes} นาที รีบกดรับ!",
+		en = "You have completed quests with unclaimed rewards. Quests reset in {minutes} min, claim them now!",
+	},
 }
 
 local Strings = {}

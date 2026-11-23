@@ -3,6 +3,12 @@
 
 export type Language = "th" | "en"
 
+export type QuestData = {
+	Day: number, -- ดัชนีวัน (QuestRules.DayIndex) ของความคืบหน้านี้ 0 = ยังไม่เคยเริ่ม
+	Progress: { [string]: number },
+	Claimed: { [string]: boolean },
+}
+
 export type PlayerData = {
 	Version: number,
 	Coins: number,
@@ -10,6 +16,7 @@ export type PlayerData = {
 	Inventory: { [string]: number },
 	Upgrades: { [string]: number },
 	Settings: { Language: Language },
+	Quests: QuestData,
 }
 
 export type RetryConfig = {
@@ -28,6 +35,7 @@ local Defaults: PlayerData = {
 	Inventory = {},
 	Upgrades = {}, -- เติม id ตอนมี Config ของอัปเกรดจริง
 	Settings = { Language = "th" },
+	Quests = { Day = 0, Progress = {}, Claimed = {} },
 }
 
 local Load: RetryConfig = {
@@ -75,6 +83,7 @@ return {
 		MaxReputation = 1000000,
 		MaxItemCount = 1000000,
 		MaxUpgradeLevel = 100,
+		MaxQuestProgress = 1000000,
 	},
 
 	-- ข้อความ error ของ Studio เมื่อไม่ได้เปิด API Services (ตัวพิมพ์เล็ก)

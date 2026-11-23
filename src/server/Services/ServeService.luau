@@ -19,6 +19,7 @@ local Remotes = require(ReplicatedStorage.Shared.Remotes)
 local DataService = require(script.Parent.DataService)
 local NotifyService = require(script.Parent.NotifyService)
 local UpgradeService = require(script.Parent.UpgradeService)
+local QuestService = require(script.Parent.QuestService)
 
 local LOG = "[ServeService]"
 
@@ -371,6 +372,7 @@ local function onServe(player: Player, orderIdRaw: unknown)
 
 	sendInventory(player, data)
 	sendCurrency(player, data)
+	QuestService.Record(player, QuestService.Kinds.Serve, order.RecipeId, 1)
 	local language = data.Settings.Language
 	local okArgs: { [string]: string | number } = {
 		dish = dishName(language, order.RecipeId),
