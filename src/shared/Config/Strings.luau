@@ -522,6 +522,50 @@ local Messages: { [string]: Entry } = {
 		th = "เร็วๆ นี้ (Coming soon)",
 		en = "Coming soon!",
 	},
+	UiHudLoading = {
+		th = "กำลังโหลด...",
+		en = "Loading...",
+	},
+	UiHudLevel = {
+		th = "เลเวล {level}",
+		en = "Lv {level}",
+	},
+	UiHudLevelMax = {
+		th = "เลเวล {level} (สูงสุด)",
+		en = "Lv {level} (max)",
+	},
+	UiOrdersTitle = {
+		th = "ออเดอร์",
+		en = "Orders",
+	},
+	UiOrdersTitleCount = {
+		th = "ออเดอร์ ({count})",
+		en = "Orders ({count})",
+	},
+	UiOrdersEmpty = {
+		th = "ยังไม่มีลูกค้า",
+		en = "No customers yet",
+	},
+	UiOrdersDish = {
+		th = "{dish} x{amount}",
+		en = "{dish} x{amount}",
+	},
+	UiOrdersEnough = {
+		th = "ขนมพอ",
+		en = "Enough",
+	},
+	UiOrdersShort = {
+		th = "ขาด {missing}",
+		en = "Need {missing} more",
+	},
+	HudLevelUp = {
+		th = "Reputation เลเวลขึ้น! ตอนนี้เลเวล {level}",
+		en = "Reputation level up! You are now Lv {level}.",
+	},
+	HudLevelDown = {
+		th = "Reputation เลเวลลดลงเป็นเลเวล {level}",
+		en = "Reputation level dropped to Lv {level}.",
+	},
 }
 
 local Strings = {}
