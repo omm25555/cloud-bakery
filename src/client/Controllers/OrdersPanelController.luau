@@ -58,6 +58,7 @@ local connections: { RBXScriptConnection } = {}
 local ui: PanelViews? = nil
 local cards: { [number]: Card } = {}
 local ordersLoaded = false
+local ordersLoadFailed = false
 local inventory: { [string]: number }? = nil
 local language: string = PlayerDataConfig.DefaultLanguage
 local collapsed = false
@@ -162,7 +163,8 @@ local function refreshChrome()
 	views.Panel.Visible = not minigameVisible
 
 	if not ordersLoaded then
-		views.Status.Text = Strings.Format("UiHudLoading", language, nil)
+		local key = if ordersLoadFailed then "UiOrdersLoadFailed" else "UiHudLoading"
+		views.Status.Text = Strings.Format(key, language, nil)
 		views.Status.Visible = true
 	elseif count == 0 then
 		views.Status.Text = Strings.Format("UiOrdersEmpty", language, nil)
@@ -391,6 +393,7 @@ local function onServeState(payload: unknown)
 			removeCard(orderId)
 		end
 		ordersLoaded = true
+		ordersLoadFailed = false
 	elseif kind == "Add" then
 		local order = readOrder(data.Order)
 		if order then
@@ -634,11 +637,13 @@ function OrdersPanelController.Start()
 		watchMinigame(playerGui)
 	end
 
-	-- ผู้เล่นแจ้งเตือนเรื่องข้อมูลไม่มาทำที่ HudController แผงนี้แค่ warn ฝั่ง dev
+	-- ครบเวลาแล้วยังไม่ได้ Snapshot: warn ฝั่ง dev และเปลี่ยนข้อความในแผงให้ผู้เล่นรู้ (กลับเป็นปกติเองเมื่อ Snapshot มา)
 	loadWarnThread = task.delay(HudConfig.LoadTimeoutSeconds, function()
 		loadWarnThread = nil
 		if not ordersLoaded then
 			warn(`{LOG} ไม่ได้รับรายการออเดอร์จาก server ภายใน {HudConfig.LoadTimeoutSeconds} วินาที`)
+			ordersLoadFailed = true
+			refreshChrome()
 		end
 	end)
 end

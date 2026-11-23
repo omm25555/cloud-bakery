@@ -546,6 +546,10 @@ local Messages: { [string]: Entry } = {
 		th = "ยังไม่มีลูกค้า",
 		en = "No customers yet",
 	},
+	UiOrdersLoadFailed = {
+		th = "โหลดรายการออเดอร์ไม่สำเร็จ ลองออกแล้วเข้าเกมใหม่",
+		en = "Couldn't load orders. Please rejoin.",
+	},
 	UiOrdersDish = {
 		th = "{dish} x{amount}",
 		en = "{dish} x{amount}",
