@@ -33,6 +33,8 @@ local Config: RateLimitsConfig = {
 		HudLevelCheck = { Capacity = 4, RefillPerSecond = 1 },
 		HudLoadTimeout = { Capacity = 1, RefillPerSecond = 0.05 },
 		HudInvalid = { Capacity = 3, RefillPerSecond = 0.5 },
+		QuestSync = { Capacity = 2, RefillPerSecond = 0.2 },
+		QuestClaim = { Capacity = 3, RefillPerSecond = 1 },
 	},
 	WarnCooldownSeconds = 5,
 	NotifyCooldownSeconds = 5,

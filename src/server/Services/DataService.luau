@@ -11,6 +11,7 @@ local RunService = game:GetService("RunService")
 
 local PlayerDataConfig = require(ReplicatedStorage.Shared.Config.PlayerData)
 local Strings = require(ReplicatedStorage.Shared.Config.Strings)
+local QuestRules = require(ReplicatedStorage.Shared.QuestRules)
 local NotifyService = require(script.Parent.NotifyService)
 
 type PlayerData = PlayerDataConfig.PlayerData
@@ -84,6 +85,7 @@ local function copyData(source: PlayerData): PlayerData
 		Inventory = copyCounts(source.Inventory),
 		Upgrades = copyCounts(source.Upgrades),
 		Settings = { Language = source.Settings.Language },
+		Quests = QuestRules.Copy(source.Quests),
 	}
 end
 
@@ -167,6 +169,10 @@ local function sanitize(raw: { [string]: any }, playerName: string): PlayerData
 	elseif settings ~= nil then
 		warn(`{LOG} Settings ของ {playerName} ไม่ถูกต้อง ใช้ค่าเริ่มต้น`)
 	end
+
+	data.Quests = QuestRules.Sanitize(raw.Quests, function(reason: string)
+		warn(`{LOG} Quests ของ {playerName} {reason}`)
+	end)
 
 	return data
 end

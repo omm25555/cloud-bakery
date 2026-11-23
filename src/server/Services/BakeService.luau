@@ -22,6 +22,7 @@ local Remotes = require(ReplicatedStorage.Shared.Remotes)
 local DataService = require(script.Parent.DataService)
 local NotifyService = require(script.Parent.NotifyService)
 local UpgradeService = require(script.Parent.UpgradeService)
+local QuestService = require(script.Parent.QuestService)
 
 local LOG = "[BakeService]"
 
@@ -225,6 +226,7 @@ local function tryDeliver(player: Player, data: PlayerData, oven: Oven, remoteNa
 	local okArgs: { [string]: string | number } = { dish = dishName(player, recipeId), amount = amount }
 	resetOven(oven)
 	sendInventory(player, data)
+	QuestService.Record(player, QuestService.Kinds.Bake, recipeId, amount)
 	NotifyService.Notify(player, "BakeCollected", "success", okArgs)
 	if grade ~= nil then
 		print(`{LOG} {player.Name} ได้ {recipeId} x{amount} (ระดับ {grade})`)
@@ -257,6 +259,7 @@ local function expireOven(oven: Oven, waitId: number)
 	local lost = amount - put
 	if put > 0 then
 		data.Inventory[recipeId] = current + put
+		QuestService.Record(player, QuestService.Kinds.Bake, recipeId, put)
 	end
 	resetOven(oven)
 	broadcastOven(oven)
