@@ -266,7 +266,7 @@ local function onOffer(player: Player, targetRaw: unknown, itemRaw: unknown, amo
 	if not limiter:Check(player, "CoopOffer") then
 		return
 	end
-	local targetUserId = readInteger(targetRaw, 1, 2 ^ 53)
+	local targetUserId = readInteger(targetRaw, 1, Coop.MaxRemoteIdValue)
 	local amount = readInteger(amountRaw, 1, Coop.MaxItemsPerGift)
 	if targetUserId == nil or amount == nil then
 		reject(player, "CoopOffer", `targetUserId/amount ไม่ถูกต้อง ({typeof(targetRaw)}, {typeof(amountRaw)})`, "CoopInvalid", nil)
@@ -413,7 +413,7 @@ local function onRespond(player: Player, offerIdRaw: unknown, acceptRaw: unknown
 	if not limiter:Check(player, "CoopRespond") then
 		return
 	end
-	local offerId = readInteger(offerIdRaw, 1, 2 ^ 53)
+	local offerId = readInteger(offerIdRaw, 1, Coop.MaxRemoteIdValue)
 	if offerId == nil or type(acceptRaw) ~= "boolean" then
 		reject(player, "CoopRespond", `offerId/accept ไม่ถูกต้อง ({typeof(offerIdRaw)}, {typeof(acceptRaw)})`, "CoopInvalid", nil)
 		return

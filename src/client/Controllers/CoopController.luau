@@ -230,7 +230,7 @@ local function buildSendPanel(root: ScreenGui)
 	list.LayoutOrder = 2
 	list.BackgroundTransparency = 1
 	list.BorderSizePixel = 0
-	list.ScrollBarThickness = 4
+	list.ScrollBarThickness = Coop.ScrollBarThicknessPixels
 	list.CanvasSize = UDim2.new()
 	list.AutomaticCanvasSize = Enum.AutomaticSize.Y
 	-- ความสูงที่เหลือ = ทั้งแผง ลบหัว แถวจำนวน และแถวปุ่ม
@@ -314,9 +314,7 @@ local function buildSendPanel(root: ScreenGui)
 			return
 		end
 		if target.Parent ~= Players then
-			warn(`{LOG} ผู้เล่นปลายทางออกจากเกมแล้ว ปิดแผง`)
-			closeSendPanel()
-			return
+			warn(`{LOG} ผู้เล่นปลายทางออกจากเกมแล้ว ให้ server แจ้งผู้เล่น`)
 		end
 		remote:FireServer(target.UserId, item, selectedAmount)
 		closeSendPanel()
@@ -547,7 +545,6 @@ local function attachPrompt(other: Player, character: Model)
 	prompt.MaxActivationDistance = Coop.PromptDistance
 	prompt.HoldDuration = Coop.PromptHoldSeconds
 	prompt.RequiresLineOfSight = Coop.PromptRequiresLineOfSight
-	prompt.UIOffset = Vector2.new(0, 0)
 	prompt.Parent = root
 	prompts[other] = prompt
 	local list = playerConnections[other]
@@ -606,6 +603,24 @@ function CoopController.Start()
 	table.insert(connections, Remotes.GetEvent("CoopState").OnClientEvent:Connect(onState))
 	table.insert(connections, Players.PlayerAdded:Connect(attachPlayer))
 	table.insert(connections, Players.PlayerRemoving:Connect(detachPlayer))
+	table.insert(
+		connections,
+		localPlayer.AncestryChanged:Connect(function()
+			if localPlayer.Parent ~= nil then
+				return
+			end
+			for _, connection in connections do
+				connection:Disconnect()
+			end
+			table.clear(connections)
+			for _, list in playerConnections do
+				for _, connection in list do
+					connection:Disconnect()
+				end
+			end
+			table.clear(playerConnections)
+		end)
+	)
 	for _, other in Players:GetPlayers() do
 		attachPlayer(other)
 	end

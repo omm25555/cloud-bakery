@@ -14,6 +14,7 @@ return {
 	-- การให้ของ
 	MaxItemsPerGift = 10, -- จำนวนสูงสุดต่อหนึ่งคำขอ
 	MaxItemIdLength = 32,
+	MaxRemoteIdValue = 2 ^ 53, -- จำนวนเต็มสูงสุดที่ใช้เป็น userId/offerId ได้ (เกินนี้ double เก็บไม่แม่น)
 	MaxGiveDistance = 20, -- studs ระหว่างผู้ให้กับผู้รับ (ตอนส่งคำขอและตอนกดรับ)
 	DistanceTolerance = 6, -- เผื่อ lag ฝั่ง server
 	OfferTimeoutSeconds = 30,
@@ -57,6 +58,7 @@ return {
 	ButtonHeightPixels = 34,
 	TitleHeightPixels = 26,
 	RowHeightPixels = 32,
+	ScrollBarThicknessPixels = 4,
 
 	-- แผงเลือกของ (กลางจอ)
 	SendPanelWidthScale = 0.5,
