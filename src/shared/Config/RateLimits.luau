@@ -35,6 +35,8 @@ local Config: RateLimitsConfig = {
 		HudInvalid = { Capacity = 3, RefillPerSecond = 0.5 },
 		QuestSync = { Capacity = 2, RefillPerSecond = 0.2 },
 		QuestClaim = { Capacity = 3, RefillPerSecond = 1 },
+		CoopOffer = { Capacity = 3, RefillPerSecond = 1 },
+		CoopRespond = { Capacity = 4, RefillPerSecond = 2 },
 	},
 	WarnCooldownSeconds = 5,
 	NotifyCooldownSeconds = 5,

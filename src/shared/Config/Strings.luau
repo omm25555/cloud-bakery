@@ -654,6 +654,154 @@ local Messages: { [string]: Entry } = {
 		th = "มีเควสที่สำเร็จแล้วแต่ยังไม่ได้รับรางวัล เควสจะรีเซ็ตใน {minutes} นาที รีบกดรับ!",
 		en = "You have completed quests with unclaimed rewards. Quests reset in {minutes} min, claim them now!",
 	},
+	CoopOfferSent = {
+		th = "ส่งคำขอให้ {item} x{count} แก่ {player} แล้ว รอเขากดรับ",
+		en = "Offered {item} x{count} to {player}. Waiting for them to accept.",
+	},
+	CoopOfferReceived = {
+		th = "{player} อยากให้ {item} x{count} แก่คุณ กดรับหรือปฏิเสธได้",
+		en = "{player} wants to give you {item} x{count}. Accept or decline.",
+	},
+	CoopAcceptedGiver = {
+		th = "{player} รับ {item} x{count} จากคุณแล้ว",
+		en = "{player} accepted {item} x{count} from you.",
+	},
+	CoopAcceptedReceiver = {
+		th = "คุณได้รับ {item} x{count} จาก {player}",
+		en = "You received {item} x{count} from {player}.",
+	},
+	CoopDeclinedGiver = {
+		th = "{player} ปฏิเสธ {item} x{count} ของคุณ ของยังอยู่กับคุณ",
+		en = "{player} declined your {item} x{count}. You keep the items.",
+	},
+	CoopDeclinedSelf = {
+		th = "ปฏิเสธของจาก {player} แล้ว",
+		en = "You declined the gift from {player}.",
+	},
+	CoopExpiredGiver = {
+		th = "คำขอให้ {item} x{count} แก่ {player} หมดเวลา ของยังอยู่กับคุณ",
+		en = "Your offer of {item} x{count} to {player} expired. You keep the items.",
+	},
+	CoopExpiredReceiver = {
+		th = "คำขอจาก {player} ({item} x{count}) หมดเวลาแล้ว",
+		en = "The offer from {player} ({item} x{count}) expired.",
+	},
+	CoopGiverLeft = {
+		th = "{player} ออกจากเกม คำขอถูกยกเลิก",
+		en = "{player} left the game. The offer was cancelled.",
+	},
+	CoopTargetLeft = {
+		th = "{player} ออกจากเกม คำขอถูกยกเลิก ของยังอยู่กับคุณ",
+		en = "{player} left the game. The offer was cancelled and you keep the items.",
+	},
+	CoopNotEnough = {
+		th = "ของไม่พอ: {item} ต้องการ {count} ชิ้น",
+		en = "Not enough {item}: you need {count}.",
+	},
+	CoopGiverNotEnough = {
+		th = "ส่งไม่สำเร็จ: {player} มี {item} ไม่ครบแล้ว",
+		en = "Transfer failed: {player} no longer has enough {item}.",
+	},
+	CoopReceiverFull = {
+		th = "ส่งไม่ได้: กระเป๋าของ {player} เต็ม",
+		en = "Can't give: {player}'s bag is full.",
+	},
+	CoopReceiverFullSelf = {
+		th = "กระเป๋าคุณเต็ม รับ {item} x{count} ไม่ได้ ทิ้งหรือใช้ของก่อนแล้วขอให้เพื่อนส่งใหม่",
+		en = "Your bag is full, so you can't take {item} x{count}. Free some space and ask again.",
+	},
+	CoopTooFar = {
+		th = "อยู่ไกลเกินไป เข้าใกล้ {player} ก่อน",
+		en = "Too far away. Move closer to {player}.",
+	},
+	CoopInvalid = {
+		th = "คำขอ Co-op ไม่ถูกต้อง",
+		en = "Invalid co-op request.",
+	},
+	CoopSelf = {
+		th = "ให้ของตัวเองไม่ได้",
+		en = "You can't give items to yourself.",
+	},
+	CoopTargetGone = {
+		th = "ไม่พบผู้เล่นคนนั้นในเกมแล้ว",
+		en = "That player is no longer in the game.",
+	},
+	CoopTooManyPending = {
+		th = "คุณมีคำขอที่รอคำตอบเยอะเกินไป รอสักครู่",
+		en = "You have too many pending offers. Please wait.",
+	},
+	CoopTargetBusy = {
+		th = "{player} มีคำขอค้างอยู่เยอะเกินไป ลองใหม่ภายหลัง",
+		en = "{player} has too many pending offers. Try again later.",
+	},
+	CoopOfferGone = {
+		th = "คำขอนี้ไม่มีแล้ว (หมดเวลา ถูกยกเลิก หรือตอบไปแล้ว)",
+		en = "This offer is gone (expired, cancelled or already answered).",
+	},
+	CoopDataNotReady = {
+		th = "ข้อมูลยังโหลดไม่เสร็จ ลองใหม่อีกครั้ง",
+		en = "Data isn't ready yet. Please try again.",
+	},
+	CoopBonusEarned = {
+		th = "โบนัสผู้ช่วย +{coins} เหรียญ เพราะ {player} ใช้ขนมที่คุณให้เสิร์ฟลูกค้า",
+		en = "Helper bonus +{coins} coins: {player} served a pastry you gave.",
+	},
+	CoopBonusCapped = {
+		th = "โบนัสผู้ช่วยวันนี้เต็มเพดานแล้ว ได้ {coins} เหรียญ",
+		en = "Today's helper bonus cap reached. You got {coins} coins.",
+	},
+	CoopHelperThanks = {
+		th = "{player} ได้โบนัสผู้ช่วยจากขนมที่ให้คุณ ขอบคุณที่ช่วยกัน!",
+		en = "{player} earned a helper bonus from the pastry they gave you. Teamwork!",
+	},
+	UiCoopPrompt = {
+		th = "ให้ของ",
+		en = "Give items",
+	},
+	UiCoopTitle = {
+		th = "ให้ของแก่ {player}",
+		en = "Give to {player}",
+	},
+	UiCoopSelectItem = {
+		th = "เลือกของที่จะให้",
+		en = "Choose an item to give",
+	},
+	UiCoopNoItems = {
+		th = "กระเป๋าว่าง ไม่มีของให้",
+		en = "Your bag is empty. Nothing to give.",
+	},
+	UiCoopItem = {
+		th = "{name} x{count}",
+		en = "{name} x{count}",
+	},
+	UiCoopAmount = {
+		th = "จำนวน {count}",
+		en = "Amount {count}",
+	},
+	UiCoopSend = {
+		th = "ส่งคำขอ",
+		en = "Send offer",
+	},
+	UiCoopCancel = {
+		th = "ยกเลิก",
+		en = "Cancel",
+	},
+	UiCoopOfferTitle = {
+		th = "{player} อยากให้ของคุณ",
+		en = "{player} wants to give you",
+	},
+	UiCoopOfferBody = {
+		th = "{name} x{count}",
+		en = "{name} x{count}",
+	},
+	UiCoopAccept = {
+		th = "รับ",
+		en = "Accept",
+	},
+	UiCoopDecline = {
+		th = "ปฏิเสธ",
+		en = "Decline",
+	},
 }
 
 local Strings = {}
