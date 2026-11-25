@@ -5,7 +5,7 @@
 
 local NotifyConfig = require(script.Parent.Notify)
 
-export type Phase ="Day" | "Dusk" | "Night" | "Dawn"
+export type Phase = "Day" | "Dusk" | "Night" | "Dawn"
 
 export type Durations = {
 	DaySeconds: number,
@@ -89,6 +89,8 @@ return {
 	-- ไม่มี attribute = DefaultMode, ค่าที่ไม่รู้จัก = DefaultMode พร้อม warn
 	DefaultMode = "Easy",
 	AttributeMode = "DayNightMode",
+	-- เริ่มรอบพลาด: ลองใหม่อัตโนมัติทุกกี่วินาที ตราบที่ยังมีผู้เล่น
+	StartRetrySeconds = 5,
 
 	-- ลำดับ phase ในหนึ่งรอบ
 	PhaseOrder = PhaseOrder,

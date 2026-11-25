@@ -890,6 +890,10 @@ local Messages: { [string]: Entry } = {
 		th = "[ทดสอบ] Config/DayNight ช่อง {field} ไม่ถูกต้อง (ค่า {value}) ใช้ค่าสำรอง {used}",
 		en = "[Test] Config/DayNight field {field} is invalid (value {value}), using fallback {used}",
 	},
+	DayNightStartFailed = {
+		th = "ระบบกลางวัน/กลางคืนเริ่มไม่สำเร็จ กำลังลองใหม่…",
+		en = "The day/night system failed to start. Retrying…",
+	},
 	DayNightPreparing = {
 		th = "กำลังเตรียมวัน…",
 		en = "Getting the day ready…",

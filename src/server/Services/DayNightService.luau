@@ -61,6 +61,7 @@ local endsAt = 0 -- เวลา server ที่ phase จะจบ (ใช้�
 local warned = false
 local phaseThread: thread? = nil
 local warnThread: thread? = nil
+local retryThread: thread? = nil
 
 local function playerCount(excluding: Player?): number
 	local count = 0
@@ -181,21 +182,47 @@ local function loadConfig()
 	end
 end
 
-local function resume()
+local resume: () -> ()
+
+local function cancelRetry()
+	if retryThread ~= nil then
+		task.cancel(retryThread)
+		retryThread = nil
+	end
+end
+
+-- เริ่มรอบพลาด: คืนสถานะ ไม่ให้ค้าง แจ้งผู้เล่นทุกคนครั้งเดียวต่อการล้ม แล้วลองใหม่อัตโนมัติ (ไม่ซ้อนหลาย thread)
+local function onStartFailed(err: string)
+	running = false
+	cancelThreads()
+	cancelRetry()
+	publish() -- ล้างเวลาจบ phase ที่อาจถูก publish ไปแล้วก่อน error
+	warn(`{LOG} เริ่มวงจรวัน/คืนไม่สำเร็จ ลองใหม่ใน {DayNight.StartRetrySeconds} วินาที: {err}`)
+	if playerCount(nil) == 0 then
+		return
+	end
+	broadcast("DayNightStartFailed", "error", nil)
+	retryThread = task.delay(DayNight.StartRetrySeconds, function()
+		retryThread = nil
+		if playerCount(nil) > 0 then
+			resume()
+		end
+	end)
+end
+
+resume = function()
 	if running then
 		return
 	end
+	cancelRetry()
 	running = true
 	if not started then
-		-- ถ้าเริ่มรอบพลาดกลางทาง ไม่ปล่อยให้ running/started ค้าง ผู้เล่นคนถัดไปที่เข้ามาจะลองเริ่มใหม่
 		local ok, err = pcall(function()
 			loadConfig()
 			enterPhase({ Phase = "Day", Day = day }, false)
 		end)
 		if not ok then
-			running = false
-			cancelThreads()
-			warn(`{LOG} เริ่มวงจรวัน/คืนไม่สำเร็จ จะลองใหม่เมื่อมีผู้เล่นเข้า: {err}`)
+			onStartFailed(tostring(err))
 			return
 		end
 		started = true
@@ -225,6 +252,7 @@ end
 
 local function onPlayerRemoving(player: Player)
 	if playerCount(player) == 0 then
+		cancelRetry()
 		pause()
 	end
 end
