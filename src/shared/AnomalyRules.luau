@@ -221,7 +221,11 @@ function AnomalyRules.PickNightType(
 	nightTypes: { Anomalies.NightType },
 	roll: number
 ): Anomalies.NightType?
-	local index = AnomalyRules.PickIndex(nightTypes, function(name: Anomalies.NightType): number
+	local names: { string } = {}
+	for _, nightType in nightTypes do
+		table.insert(names, nightType)
+	end
+	local index = AnomalyRules.PickIndex(names, function(name: string): number
 		return weights[name] or 0
 	end, roll)
 	if index == nil then
