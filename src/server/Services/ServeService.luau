@@ -20,6 +20,7 @@ local DataService = require(script.Parent.DataService)
 local NotifyService = require(script.Parent.NotifyService)
 local UpgradeService = require(script.Parent.UpgradeService)
 local QuestService = require(script.Parent.QuestService)
+local CoopService = require(script.Parent.CoopService)
 
 local LOG = "[ServeService]"
 
@@ -373,6 +374,13 @@ local function onServe(player: Player, orderIdRaw: unknown)
 	sendInventory(player, data)
 	sendCurrency(player, data)
 	QuestService.Record(player, QuestService.Kinds.Serve, order.RecipeId, 1)
+	-- โบนัสผู้ช่วย co-op (TASK-010): ล้มเหลวต้องไม่กระทบการเสิร์ฟที่จบแล้ว
+	local coopOk, coopErr = pcall(function()
+		CoopService.OnServed(player, order.RecipeId, order.Amount, coinsAdded)
+	end)
+	if not coopOk then
+		warn(`{LOG} {player.Name} CoopService.OnServed ล้มเหลว: {coopErr}`)
+	end
 	local language = data.Settings.Language
 	local okArgs: { [string]: string | number } = {
 		dish = dishName(language, order.RecipeId),
