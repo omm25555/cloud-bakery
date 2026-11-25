@@ -12,7 +12,7 @@ type Durations = DayNight.Durations
 export type Problem = {
 	Field: string,
 	Value: string,
-	Used: number,
+	Used: string | number,
 }
 
 export type State = {
@@ -35,6 +35,17 @@ local function isValid(field: string, value: unknown): boolean
 		return number >= 0
 	end
 	return number > 0
+end
+
+-- โหมดที่ใช้จริง: ไม่มีค่า = defaultMode (ไม่ใช่ปัญหา), ไม่รู้จัก = defaultMode และ known=false
+function DayNightRules.ResolveMode(raw: unknown, modes: { [string]: Durations }, defaultMode: string): (string, boolean)
+	if raw == nil then
+		return defaultMode, true
+	end
+	if type(raw) == "string" and modes[raw] ~= nil then
+		return raw, true
+	end
+	return defaultMode, false
 end
 
 function DayNightRules.ToMap(durations: Durations): { [string]: unknown }

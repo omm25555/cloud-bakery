@@ -26,22 +26,21 @@ export type Look = {
 	AtmosphereHaze: number,
 }
 
-local Production: Durations = {
-	DaySeconds = 180,
-	DuskSeconds = 60,
-	NightSeconds = 180,
-	DawnSeconds = 60,
-	WarningSeconds = 30,
+-- ความยาวช่วงตามโหมด (วินาที) โหมดยากมี anomaly แนบเนียนกว่า จึงมีกลางคืนยาวขึ้น
+-- Production = ค่าจริง, Studio = ค่าสั้นสำหรับทดสอบ (DayNightService เลือกด้วย RunService:IsStudio())
+local Production: { [string]: Durations } = {
+	Easy = { DaySeconds = 180, DuskSeconds = 60, NightSeconds = 180, DawnSeconds = 60, WarningSeconds = 30 },
+	Hard = { DaySeconds = 180, DuskSeconds = 60, NightSeconds = 240, DawnSeconds = 60, WarningSeconds = 30 },
+	Nightmare = { DaySeconds = 180, DuskSeconds = 60, NightSeconds = 300, DawnSeconds = 60, WarningSeconds = 30 },
 }
 
-local Studio: Durations = {
-	DaySeconds = 40,
-	DuskSeconds = 6,
-	NightSeconds = 40,
-	DawnSeconds = 6,
-	WarningSeconds = 10,
+local Studio: { [string]: Durations } = {
+	Easy = { DaySeconds = 40, DuskSeconds = 6, NightSeconds = 40, DawnSeconds = 6, WarningSeconds = 10 },
+	Hard = { DaySeconds = 40, DuskSeconds = 6, NightSeconds = 55, DawnSeconds = 6, WarningSeconds = 10 },
+	Nightmare = { DaySeconds = 40, DuskSeconds = 6, NightSeconds = 70, DawnSeconds = 6, WarningSeconds = 10 },
 }
 
+-- ค่าสำรองที่ปลอดภัย (เท่ากับ Easy ของ Production) ใช้เมื่อค่าที่เลือกไม่ผ่านการตรวจ
 local Fallback: Durations = {
 	DaySeconds = 180,
 	DuskSeconds = 60,
@@ -81,6 +80,11 @@ return {
 	Production = Production,
 	Studio = Studio,
 	Fallback = Fallback,
+
+	-- โหมด: ตอนนี้ยังไม่มีระบบเลือก (TASK-019) ระบบนั้นตั้ง attribute นี้บน ReplicatedStorage ก่อนผู้เล่นคนแรกเข้า
+	-- ไม่มี attribute = DefaultMode, ค่าที่ไม่รู้จัก = DefaultMode พร้อม warn
+	DefaultMode = "Easy",
+	AttributeMode = "DayNightMode",
 
 	-- ลำดับ phase ในหนึ่งรอบ และรายชื่อช่องที่ต้องตรวจ
 	PhaseOrder = { "Day", "Dusk", "Night", "Dawn" } :: { Phase },

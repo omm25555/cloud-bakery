@@ -5,7 +5,9 @@
 -- สถานะอยู่ในหน่วยความจำของ server เท่านั้น ไม่บันทึก DataStore
 -- sync ไป client ด้วย Attributes บน ReplicatedStorage (ชื่อใน Config/DayNight)
 -- เลขคืน = เลขวันเดียวกัน: Dusk/Night/Dawn ของ "วันที่ N" คือ "คืนที่ N"
--- API สำหรับระบบอื่น: GetPhase, GetDayNumber, GetNightNumber, GetTimeRemaining, IsNight, IsRunning
+-- โหมด (Easy/Hard/Nightmare) อ่านจาก attribute DayNightMode บน ReplicatedStorage ตอนเริ่มรอบ (ผู้เล่นคนแรกเข้า)
+--   ไม่มี = Easy, ไม่รู้จัก = Easy พร้อม warn ความยาวช่วงตามโหมดอยู่ใน Config/DayNight
+-- API สำหรับระบบอื่น: GetMode, GetPhase, GetDayNumber, GetNightNumber, GetTimeRemaining, IsNight, IsRunning
 -- สัญญาณภายใน (BindableEvent ไม่ส่งให้ client): OnPhaseChanged(phase, dayNumber),
 --   OnNightStarted(nightNumber) ตอนเริ่ม Night, OnMorningStarted(dayNumber) ตอนเริ่ม Day หลัง Dawn
 -- วันที่ 1 ตอนเริ่มรอบยิงเฉพาะ OnPhaseChanged (ไม่ใช่ OnMorningStarted)
@@ -37,6 +39,7 @@ DayNightService.OnMorningStarted = morningStarted.Event
 
 local durations: Durations = DayNight.Fallback
 local configProblems: { DayNightRules.Problem } = {}
+local mode: string = DayNight.DefaultMode
 
 local started = false -- เริ่มรอบแล้ว (มี phase)
 local running = false -- กำลังนับเวลา
@@ -149,10 +152,33 @@ local function resume()
 	running = true
 	if not started then
 		started = true
+		loadConfig()
 		enterPhase({ Phase = "Day", Day = day }, false)
 		return
 	end
 	schedule()
+end
+
+-- เลือกโหมดและตรวจค่า config ของโหมดนั้น (เรียกครั้งเดียวตอนเริ่มรอบ)
+local function loadConfig()
+	configProblems = {}
+	local sets = if RunService:IsStudio() then DayNight.Studio else DayNight.Production
+	local raw = ReplicatedStorage:GetAttribute(DayNight.AttributeMode)
+	local resolved, known = DayNightRules.ResolveMode(raw, sets, DayNight.DefaultMode)
+	mode = resolved
+	if not known then
+		table.insert(configProblems, { Field = "Mode", Value = tostring(raw), Used = resolved })
+	end
+	local chosen = sets[mode]
+	local candidate: { [string]: unknown } = if chosen ~= nil then DayNightRules.ToMap(chosen) else {}
+	local validated, problems = DayNightRules.Validate(candidate, DayNight.Fallback)
+	durations = validated
+	for _, problem in problems do
+		table.insert(configProblems, problem)
+	end
+	for _, problem in configProblems do
+		warn(`{LOG} Config/DayNight ช่อง {problem.Field} ไม่ถูกต้อง (ค่า {problem.Value}) ใช้ค่าสำรอง {problem.Used}`)
+	end
 end
 
 local function notifyConfigProblems(player: Player)
@@ -169,14 +195,18 @@ local function notifyConfigProblems(player: Player)
 end
 
 local function onPlayerAdded(player: Player)
-	notifyConfigProblems(player)
 	resume()
+	notifyConfigProblems(player)
 end
 
 local function onPlayerRemoving(player: Player)
 	if playerCount(player) == 0 then
 		pause()
 	end
+end
+
+function DayNightService.GetMode(): string
+	return mode
 end
 
 function DayNightService.GetPhase(): Phase
@@ -207,16 +237,6 @@ function DayNightService.GetTimeRemaining(): number
 end
 
 function DayNightService.Start()
-	local chosen = if RunService:IsStudio() then DayNight.Studio else DayNight.Production
-	local validated, problems = DayNightRules.Validate(DayNightRules.ToMap(chosen), DayNight.Fallback)
-	durations = validated
-	configProblems = problems
-	for _, problem in problems do
-		warn(
-			`{LOG} Config/DayNight ช่อง {problem.Field} ไม่ถูกต้อง (ค่า {problem.Value}) ใช้ค่าสำรอง {problem.Used}`
-		)
-	end
-
 	Players.PlayerAdded:Connect(onPlayerAdded)
 	Players.PlayerRemoving:Connect(onPlayerRemoving)
 	for _, player in Players:GetPlayers() do
