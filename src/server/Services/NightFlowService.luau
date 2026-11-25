@@ -88,7 +88,8 @@ local function onNightEnded(night: number, missed: number)
 	end
 	local amount = Sanity.Values.LeftoverCustomer * missed
 	warn(`{LOG} คืนที่ {night} หมดเวลา ลูกค้าเหลือ {missed} คน ทุกคนเสียสติ {amount}`)
-	drainAll(amount, "LeftoverCustomers", "NightLeftover", { count = missed })
+	local extra: { [string]: string | number } = { count = missed }
+	drainAll(amount, "LeftoverCustomers", "NightLeftover", extra)
 end
 
 -- anomaly หลายตัวที่ถูกล้างพร้อมกันตอนเช้ารวมเป็นการหักสติและ toast ครั้งเดียว

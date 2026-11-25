@@ -46,12 +46,18 @@ local function round(instance: GuiObject, radius: number)
 	corner.Parent = instance
 end
 
-local function limitText(label: TextLabel | TextButton)
-	label.TextScaled = true
+local function limitText(instance: Instance)
+	if instance:IsA("TextLabel") then
+		instance.TextScaled = true
+	elseif instance:IsA("TextButton") then
+		instance.TextScaled = true
+	else
+		return
+	end
 	local limit = Instance.new("UITextSizeConstraint")
 	limit.MaxTextSize = Report.MaxTextSize
 	limit.MinTextSize = Report.MinTextSize
-	limit.Parent = label
+	limit.Parent = instance
 end
 
 local function makeButton(parent: Instance, text: string, color: Color3, textColor: Color3): TextButton
