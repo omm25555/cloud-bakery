@@ -119,6 +119,27 @@ return {
 	GridColumns = 3,
 	GridGapPixels = 8,
 	ButtonMinHeightPixels = 64, -- ปุ่มใหญ่พอแตะบนมือถือ
+	CustomerButtonHeightPixels = 84, -- ปุ่มลูกค้า (รูป + ชื่อ)
+
+	-- จอเตี้ย (ความสูง viewport ต่ำกว่าค่านี้ เช่นมือถือแนวนอน 640x360): แผงสูงขึ้นแต่ไม่เกินจอ บีบหัว/ท้าย/ปุ่มให้เตี้ยลง
+	CompactViewportHeightPixels = 480,
+	CompactPanelHeightScale = 0.92,
+	CompactPanelMaxHeightPixels = 360,
+	CompactPanelPaddingPixels = 6,
+	CompactTitleHeightPixels = 24,
+	CompactLineHeightPixels = 22,
+	CompactFooterHeightPixels = 34,
+	CompactGridGapPixels = 6,
+	CompactButtonMinHeightPixels = 44,
+	CompactCustomerButtonHeightPixels = 76,
+
+	-- รูปลูกค้าในเมนู (ViewportFrame โคลนโมเดลลูกค้าที่ ServeController สร้างฝั่ง client)
+	CustomerFolderName = "ServeCustomers",
+	CustomerViewportHeightScale = 0.66, -- สัดส่วนความสูงปุ่มที่เป็นรูป ส่วนที่เหลือเป็นชื่อ
+	CustomerViewportDistanceFactor = 1.6, -- ระยะกล้อง = ขนาดโมเดล x ค่านี้
+	CustomerViewportBackgroundColor = Color3.fromRGB(255, 225, 235),
+	CustomerViewportLightColor = Color3.fromRGB(255, 255, 255),
+	CustomerViewportAmbientColor = Color3.fromRGB(200, 190, 210),
 	Font = Enum.Font.GothamMedium,
 	MaxTextSize = 20,
 	MinTextSize = 8,
