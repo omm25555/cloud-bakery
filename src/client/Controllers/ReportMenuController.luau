@@ -39,7 +39,6 @@ type Views = {
 }
 
 type Metrics = {
-	Compact: boolean,
 	HeightScale: number,
 	MaxHeight: number,
 	Padding: number,
@@ -64,7 +63,6 @@ local function getMetrics(): Metrics
 	local compact = camera ~= nil and camera.ViewportSize.Y < Report.CompactViewportHeightPixels
 	if compact then
 		return {
-			Compact = true,
 			HeightScale = Report.CompactPanelHeightScale,
 			MaxHeight = Report.CompactPanelMaxHeightPixels,
 			Padding = Report.CompactPanelPaddingPixels,
@@ -77,7 +75,6 @@ local function getMetrics(): Metrics
 		}
 	end
 	return {
-		Compact = false,
 		HeightScale = Report.PanelHeightScale,
 		MaxHeight = Report.PanelMaxHeightPixels,
 		Padding = Report.PanelPaddingPixels,
