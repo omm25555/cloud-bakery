@@ -58,6 +58,13 @@ local inventoryEvent = Remotes.GetEvent("InventoryUpdate")
 
 local ServeService = {}
 
+-- TASK-014: สัญญาณให้ระบบอื่นรู้ว่ามีออเดอร์ถูกเสิร์ฟ (เพิ่มอย่างเดียว ไม่เปลี่ยนพฤติกรรมเดิม)
+local orderServedEvent = Instance.new("BindableEvent")
+
+function ServeService.OnOrderServed(callback: (player: Player, orderId: number, customerId: string) -> ()): RBXScriptConnection
+	return orderServedEvent.Event:Connect(callback)
+end
+
 local orders: { [number]: Order } = {}
 local seatOrders: { [number]: Order } = {}
 local seatParts: { [number]: BasePart } = {}
@@ -410,6 +417,7 @@ local function onServe(player: Player, orderIdRaw: unknown)
 		end
 	end
 	print(`{LOG} {player.Name} เสิร์ฟออเดอร์ {order.Id} ({order.RecipeId} x{order.Amount}) หัวใจ {hearts} +{coinsAdded} เหรียญ +{repAdded} Reputation`)
+	orderServedEvent:Fire(player, order.Id, order.CustomerId)
 end
 
 -- ขอ snapshot ตอนเข้าเกม: ออเดอร์ทั้งหมด + เหรียญ/Reputation (รอข้อมูลโหลดก่อนส่งส่วนเหรียญ)
@@ -564,6 +572,20 @@ local function createStations()
 	end
 	folder.Parent = Workspace
 	print(`{LOG} สร้างสถานีแล้ว: {table.concat(logLines, " | ")}`)
+end
+
+-- ลูกค้าที่ยังรอเสิร์ฟอยู่ตอนนี้ (copy เรียงตามช่องนั่ง)
+function ServeService.GetActiveCustomers(): { { OrderId: number, CustomerId: string, Seat: number } }
+	local result: { { OrderId: number, CustomerId: string, Seat: number } } = {}
+	for _, order in orders do
+		if not order.Served then
+			table.insert(result, { OrderId = order.Id, CustomerId = order.CustomerId, Seat = order.Seat })
+		end
+	end
+	table.sort(result, function(a, b)
+		return a.Seat < b.Seat
+	end)
+	return result
 end
 
 function ServeService.Start()

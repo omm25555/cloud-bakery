@@ -39,6 +39,8 @@ local Config: RateLimitsConfig = {
 		CoopRespond = { Capacity = 4, RefillPerSecond = 2 },
 		LobbyPrompt = { Capacity = 3, RefillPerSecond = 1 },
 		LobbyReady = { Capacity = 2, RefillPerSecond = 0.2 },
+		ReportPrompt = { Capacity = 2, RefillPerSecond = 0.5 },
+		ReportSubmit = { Capacity = 2, RefillPerSecond = 0.5 },
 	},
 	WarnCooldownSeconds = 5,
 	NotifyCooldownSeconds = 5,

@@ -51,3 +51,15 @@
 - โควตาลูกค้ากลางคืน (roster ตัวนับใน `AnomalyService` ยังไม่ผูกลูกค้าจริง): สุ่ม `BaseMin..BaseMax` เพิ่ม `GrowthAmount` ทุก `GrowthEveryNights` คืน clamp `HardMin..HardMax` (1..5) `Pending == 0` ยิง `OnRosterComplete` ครั้งเดียว ตอน Dawn slot ที่ค้างเป็น `Missed` แล้วยิง `OnNightEnded`
 - `DayNightService.RequestEndNight(countdownSeconds)` ย่อเวลาที่เหลือของคืน (ไม่ยืดคืน เหลือน้อยกว่า countdown อยู่แล้ว = ไม่ทำอะไร คืน `true`) ตรวจค่าด้วย `DayNightRules.ClampEndCountdown`
 - เครื่องมือ Studio (เฉพาะ `RunService:IsStudio()`) attribute บน `ServerStorage`: `AnomalyForceNight` (`Anomaly`/`Normal`), `AnomalyForceIds` (เช่น `ColorShift,Relocate` เกิดทันที), `AnomalyDebugHandle` (จำนวนลูกค้าที่ให้ถือว่าเสิร์ฟแล้ว)
+
+## รายงานผู้จัดการ + สติ (TASK-014)
+- ผู้จัดการร้าน (`ReportService` สร้างโมเดลจาก Part ใน `Workspace.ShopManager` ตำแหน่งอิง SpawnLocation) มี ProximityPrompt "รายงาน" ผู้เล่นต้องเดินไปหาเอง server เปิดเมนูรายงาน (session ที่ server) ให้เฉพาะผู้ที่กด รายงานได้เฉพาะตอนกลางคืนที่กำลังนับเวลา
+- remote ใหม่ 3 ตัว: `ReportSubmit` (client→server: `category`, `customerId?`), `ReportMenu`, `ReportResult` (server→client) rate limit `ReportSubmit`/`ReportPrompt` ใน `Config/RateLimits` สติและนับถอยหลังจบคืนส่งด้วย attribute (ไม่มี remote)
+- server ตรวจ: rate limit, ชนิด/ค่า (หมวดต้องอยู่ใน `AnomalyService.GetCategories()`, `customerId` เฉพาะหมวด customer และต้องอยู่ในรายชื่อที่ server ส่งให้เมนู), session เมนู, ระยะจากผู้จัดการ, ช่วงคืน, cooldown, ข้อมูลผู้เล่น
+- ถูก (`HasActiveOfCategory`): `ResolveAnomaly` + เหรียญเฉพาะผู้รายงาน (`CoinReward + CoinPerSubtlety x Subtlety`) + ตัวนับสูตรต่อรอบ (`ReportService.GetRecipeProgress()` อยู่ใน memory หน้าสูตรจริงเป็น TASK-018) + ลูกค้า anomaly ปิด slot เป็น `Reported` + ผู้จัดการชม
+- ผิด (รวมคืนที่ไม่มี anomaly): ผู้รายงานเสียสติ `Sanity.Values.WrongReport` + ผู้จัดการหลอนขึ้นตามจำนวนครั้งที่ผิดในคืนนั้น (`Report.WrongHauntLevels`/`HauntStyles` ระดับ 1-3+) ไม่ทำร้ายใคร
+- บทผู้จัดการอยู่ใน `Config/ManagerLines` (th/en แยกตามสถานการณ์ สุ่มบรรทัด) แก้ได้โดยไม่แตะโค้ด
+- `SanityService`: สติต่อผู้เล่นใน memory (รีเซ็ตทุกคืน) API `Get`, `GetMax`, `Change(player, delta, reason)`, `Set`, `ResetAll`, `OnChanged`, `OnDepleted` (ยิงตอนข้ามลงถึง 0) ค่าอยู่ใน `Config/Sanity`
+- `NightFlowService`: ออเดอร์ที่เสิร์ฟตอนคืน (`ServeService.OnOrderServed`) 1 ออเดอร์ = ปิด roster 1 slot เป็น `Served`; roster ครบ -> toast + นับถอยหลัง + `DayNightService.RequestEndNight(Report.EndNightCountdownSeconds)`; หมดเวลาแล้วลูกค้าเหลือ / anomaly ไม่ถูกรายงานจนเช้า -> ทุกคนเสียสติ
+- ข้อยกเว้นที่เจ้าของอนุมัติ: เพิ่ม `ServeService.OnOrderServed` และ `ServeService.GetActiveCustomers` (เพิ่มอย่างเดียว)
+- เครื่องมือ Studio (เฉพาะ `RunService:IsStudio()` attribute บน `ServerStorage`): `SanityDebugSet` (ตัวเลข = ตั้งสติทุกคน), `NightDebugRosterComplete` (true = roster ครบทันที) ร่วมกับ `AnomalyForceNight`/`AnomalyForceIds` ของ TASK-013
