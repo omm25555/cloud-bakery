@@ -27,10 +27,10 @@ export type Look = {
 }
 
 local Production: Durations = {
-	DaySeconds = 300,
-	DuskSeconds = 20,
-	NightSeconds = 240,
-	DawnSeconds = 20,
+	DaySeconds = 180,
+	DuskSeconds = 60,
+	NightSeconds = 180,
+	DawnSeconds = 60,
 	WarningSeconds = 30,
 }
 
@@ -43,10 +43,10 @@ local Studio: Durations = {
 }
 
 local Fallback: Durations = {
-	DaySeconds = 300,
-	DuskSeconds = 20,
-	NightSeconds = 240,
-	DawnSeconds = 20,
+	DaySeconds = 180,
+	DuskSeconds = 60,
+	NightSeconds = 180,
+	DawnSeconds = 60,
 	WarningSeconds = 30,
 }
 
