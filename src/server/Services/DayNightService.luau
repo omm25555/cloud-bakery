@@ -33,9 +33,20 @@ local morningStarted = Instance.new("BindableEvent")
 
 local DayNightService = {}
 
-DayNightService.OnPhaseChanged = phaseChanged.Event
-DayNightService.OnNightStarted = nightStarted.Event
-DayNightService.OnMorningStarted = morningStarted.Event
+-- ยิงทุกครั้งที่เข้า phase ใหม่ (รวม Day วันที่ 1 ตอนเริ่มรอบ)
+function DayNightService.OnPhaseChanged(callback: (phase: Phase, dayNumber: number) -> ()): RBXScriptConnection
+	return phaseChanged.Event:Connect(callback)
+end
+
+-- ยิงตอนเริ่ม Night ส่งเลขคืน (= เลขวันเดียวกัน)
+function DayNightService.OnNightStarted(callback: (nightNumber: number) -> ()): RBXScriptConnection
+	return nightStarted.Event:Connect(callback)
+end
+
+-- ยิงตอนเริ่ม Day หลัง Dawn ส่งเลขวันใหม่ (ไม่ยิงตอนเริ่มรอบวันที่ 1)
+function DayNightService.OnMorningStarted(callback: (dayNumber: number) -> ()): RBXScriptConnection
+	return morningStarted.Event:Connect(callback)
+end
 
 local durations: Durations = DayNight.Fallback
 local configProblems: { DayNightRules.Problem } = {}
@@ -176,9 +187,18 @@ local function resume()
 	end
 	running = true
 	if not started then
+		-- ถ้าเริ่มรอบพลาดกลางทาง ไม่ปล่อยให้ running/started ค้าง ผู้เล่นคนถัดไปที่เข้ามาจะลองเริ่มใหม่
+		local ok, err = pcall(function()
+			loadConfig()
+			enterPhase({ Phase = "Day", Day = day }, false)
+		end)
+		if not ok then
+			running = false
+			cancelThreads()
+			warn(`{LOG} เริ่มวงจรวัน/คืนไม่สำเร็จ จะลองใหม่เมื่อมีผู้เล่นเข้า: {err}`)
+			return
+		end
 		started = true
-		loadConfig()
-		enterPhase({ Phase = "Day", Day = day }, false)
 		return
 	end
 	schedule()
@@ -221,6 +241,8 @@ function DayNightService.GetDayNumber(): number
 	return day
 end
 
+-- เลขคืน = เลขวันเดียวกัน คืนของ "วันนี้" (คืนที่กำลังจะมาถึงตอน Day/Dusk หรือคืนที่กำลังเป็นอยู่ตอน Night/Dawn)
+-- ตอน Day วันที่ N คืนนี้คืน N ยังไม่เกิด ถ้าต้องการรู้ว่าอยู่ในคืนหรือไม่ให้ใช้ IsNight()
 function DayNightService.GetNightNumber(): number
 	return day
 end

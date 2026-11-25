@@ -3,7 +3,9 @@
 -- Production = ค่าจริง, Studio = ค่าสั้นสำหรับทดสอบ (DayNightService เลือกด้วย RunService:IsStudio())
 -- Fallback = ค่าสำรองที่ปลอดภัย ใช้เมื่อค่าที่เลือกไม่ผ่านการตรวจ
 
-export type Phase = "Day" | "Dusk" | "Night" | "Dawn"
+local NotifyConfig = require(script.Parent.Notify)
+
+export type Phase ="Day" | "Dusk" | "Night" | "Dawn"
 
 export type Durations = {
 	DaySeconds: number,
@@ -88,9 +90,8 @@ return {
 	DefaultMode = "Easy",
 	AttributeMode = "DayNightMode",
 
-	-- ลำดับ phase ในหนึ่งรอบ และรายชื่อช่องที่ต้องตรวจ
+	-- ลำดับ phase ในหนึ่งรอบ
 	PhaseOrder = PhaseOrder,
-	DurationFields = { "DaySeconds", "DuskSeconds", "NightSeconds", "DawnSeconds", "WarningSeconds" } :: { string },
 	-- ช่องที่ตั้งเป็น 0 ได้ (ช่วงเปลี่ยนถูกข้าม / ปิดการเตือน) ช่องอื่นต้อง > 0
 	ZeroAllowed = { DuskSeconds = true, DawnSeconds = true, WarningSeconds = true } :: { [string]: boolean },
 
@@ -106,12 +107,17 @@ return {
 	HoursPerDay = 24,
 	AtmosphereName = "DayNightAtmosphere",
 
-	-- UI (มุมซ้ายบน ใต้แถบเมนู Roblox ไม่ทับ HUD ขวาบน/toast กลางบน)
+	-- UI: กลางบนจอ ใต้ toast แถวแรก (ซ้ายบน = Quest, ขวาบน = HUD/Orders, ซ้ายกลาง = ป้ายกระเป๋า,
+	-- ล่างกลาง = แถบพืช/เมนู, ขวาล่าง = ปุ่มเมนู) toast สูงสุด 3 แถวอาจทับกล่องนี้ชั่วคราว 4 วินาที (toast อยู่ชั้นบนสุด)
+	-- TopOffsetPixels = Notify.TopOffsetPixels + ความสูง toast 1 แถว (TextSize + Padding บน/ล่าง) + Notify.SpacingPixels
 	GuiName = "DayNightGui",
 	GuiDisplayOrder = 15,
 	SecondsPerMinute = 60,
 	RefreshSeconds = 0.25,
-	MarginPixels = 10,
+	TopOffsetPixels = NotifyConfig.TopOffsetPixels
+		+ NotifyConfig.TextSize
+		+ NotifyConfig.PaddingPixels * 2
+		+ NotifyConfig.SpacingPixels,
 	WidthScale = 0.22,
 	MinWidthPixels = 150,
 	MaxWidthPixels = 230,
@@ -128,4 +134,6 @@ return {
 	DayAccentColor = Color3.fromRGB(255, 210, 90),
 	NightAccentColor = Color3.fromRGB(190, 150, 240),
 	TitleHeightScale = 0.5,
+	CounterWidthScale = 0.5,
+	TimeWidthScale = 0.5,
 }

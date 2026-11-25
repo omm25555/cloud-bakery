@@ -1,5 +1,5 @@
 --!strict
--- DayNightController: แสดง phase/เลขวัน-คืน/เวลาที่เหลือ (DayNightGui มุมซ้ายบน) และปรับ Lighting ตามสถานะจาก server
+-- DayNightController: แสดง phase/เลขวัน-คืน/เวลาที่เหลือ (DayNightGui กลางบนจอ ใต้ toast แถวแรก) และปรับ Lighting ตามสถานะจาก server
 -- อ่านจาก Attributes บน ReplicatedStorage เท่านั้น (server เป็นผู้ตัดสิน) client แค่แสดงผล ไม่ส่งอะไรกลับ
 -- ถ้ายังไม่มีสถานะ (ยังไม่เริ่ม/หยุดนับ) แสดงข้อความ "กำลังเตรียมวัน" และไม่แตะ Lighting
 
@@ -106,8 +106,8 @@ local function createGui(): Views?
 
 	local root = Instance.new("Frame")
 	root.Name = "Root"
-	root.AnchorPoint = Vector2.new(0, 0)
-	root.Position = UDim2.fromOffset(DayNight.MarginPixels, DayNight.MarginPixels)
+	root.AnchorPoint = Vector2.new(0.5, 0)
+	root.Position = UDim2.new(0.5, 0, 0, DayNight.TopOffsetPixels)
 	root.Size = UDim2.new(DayNight.WidthScale, 0, 0, DayNight.HeightPixels)
 	root.BackgroundColor3 = DayNight.BackgroundColor
 	root.BackgroundTransparency = DayNight.BackgroundTransparency
@@ -132,13 +132,13 @@ local function createGui(): Views?
 	local counter = makeLabel(root, "Counter", Enum.TextXAlignment.Left)
 	counter.AnchorPoint = Vector2.new(0, 1)
 	counter.Position = UDim2.fromScale(0, 1)
-	counter.Size = UDim2.fromScale(0.5, 1 - DayNight.TitleHeightScale)
+	counter.Size = UDim2.fromScale(DayNight.CounterWidthScale, 1 - DayNight.TitleHeightScale)
 	counter.TextColor3 = DayNight.SubTextColor
 
 	local time = makeLabel(root, "Time", Enum.TextXAlignment.Right)
 	time.AnchorPoint = Vector2.new(1, 1)
 	time.Position = UDim2.fromScale(1, 1)
-	time.Size = UDim2.fromScale(0.5, 1 - DayNight.TitleHeightScale)
+	time.Size = UDim2.fromScale(DayNight.TimeWidthScale, 1 - DayNight.TitleHeightScale)
 
 	gui.Parent = playerGui
 	return { Title = title, Counter = counter, Time = time }
