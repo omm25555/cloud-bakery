@@ -20,3 +20,11 @@
 - ลูกค้าเพนกวิน (ผ้าพันคอ)
 - Monetization แบบ Non-Pay-to-Win: ชุดเชฟ, สกินเตาพาสเทล, ของตกแต่ง, VIP Decor Pack
 - ปุ่ม Pets/Decor ใน HUD (MVP แสดงแต่ล็อก "เร็วๆ นี้")
+
+## Lobby และ Teleport (TASK-011)
+- repo มี 2 Rojo project: `default.project.json` (เกาะ) และ `lobby.project.json` (ล็อบบี้ `CloudBakeryLobby`)
+- ล็อบบี้ไม่มี DataService ใช้ `NotifyService` / `NotifyController` ร่วมกับเกาะ โค้ดอยู่ใน `src/lobby/`
+- ผู้เล่นเข้ากลุ่มที่แท่นผ่าน ProximityPrompt สูงสุด 4 คน นับถอยหลัง 15 วิ (เหลือ 5 วิเมื่อครบ 4 คน) ตัวเลขอยู่ใน `Config/Lobby`
+- กลุ่มถูก teleport ไป reserved server ของเกาะผ่าน `TeleportOptions.ReservedServerId` (GUID ที่ server สร้าง) พร้อม retry ตาม Config
+- ต้องกรอก Place ID ใน `Config/Places` (0 = ยังไม่ตั้ง จะแจ้งผู้เล่นและ `warn` ไม่ teleport)
+- `RoundEntryService` ของเกาะมี 3 โหมด: `Local` (Studio), `Reserved` (ตรวจ TeleportData จาก lobby), `Direct` (เข้าตรงโดยไม่ผ่าน lobby แจ้งผู้เล่นและพากลับ lobby ได้)
