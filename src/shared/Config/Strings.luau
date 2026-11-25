@@ -874,6 +874,54 @@ local Messages: { [string]: Entry } = {
 		th = "รอผู้เล่นเพิ่ม",
 		en = "Waiting for players",
 	},
+	DayNightDuskWarning = {
+		th = "อีก {seconds} วินาทีจะค่ำแล้ว…",
+		en = "Dusk in {seconds}s…",
+	},
+	DayNightNightStarted = {
+		th = "ค่ำแล้ว… คืนที่ {night}",
+		en = "Night has fallen… Night {night}",
+	},
+	DayNightMorningStarted = {
+		th = "เช้าแล้ว! วันที่ {day}",
+		en = "Good morning! Day {day}",
+	},
+	DayNightConfigInvalid = {
+		th = "[ทดสอบ] Config/DayNight ช่อง {field} ไม่ถูกต้อง (ค่า {value}) ใช้ค่าสำรอง {used}",
+		en = "[Test] Config/DayNight field {field} is invalid (value {value}), using fallback {used}",
+	},
+	DayNightStartFailed = {
+		th = "ระบบกลางวัน/กลางคืนเริ่มไม่สำเร็จ กำลังลองใหม่…",
+		en = "The day/night system failed to start. Retrying…",
+	},
+	DayNightPreparing = {
+		th = "กำลังเตรียมวัน…",
+		en = "Getting the day ready…",
+	},
+	DayNightLabelDay = {
+		th = "กลางวัน",
+		en = "Daytime",
+	},
+	DayNightLabelDusk = {
+		th = "ใกล้ค่ำ",
+		en = "Dusk",
+	},
+	DayNightLabelNight = {
+		th = "กลางคืน",
+		en = "Night",
+	},
+	DayNightLabelDawn = {
+		th = "ใกล้เช้า",
+		en = "Dawn",
+	},
+	DayNightCounterDay = {
+		th = "วันที่ {day}",
+		en = "Day {day}",
+	},
+	DayNightCounterNight = {
+		th = "คืนที่ {day}",
+		en = "Night {day}",
+	},
 }
 
 local Strings = {}
