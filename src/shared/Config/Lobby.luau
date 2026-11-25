@@ -33,6 +33,10 @@ return {
 	PadLabelTextColor = Color3.fromRGB(255, 255, 255),
 	PromptHoldSeconds = 0.3,
 	PromptMaxDistance = 10,
+	-- ตรวจว่าผู้เล่นยังอยู่บนแท่นไหม (server เช็คจากตำแหน่ง HumanoidRootPart)
+	PresenceCheckSeconds = 0.25,
+	PadExitMarginStuds = 4,
+	PadExitHeightStuds = 10,
 
 	-- UI ฝั่ง client
 	UiDisplayOrder = 50,

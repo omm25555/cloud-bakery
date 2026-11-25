@@ -30,6 +30,7 @@ type Pad = {
 	EndsAt: number,
 	Generation: number,
 	Label: TextLabel,
+	Part: Part,
 }
 
 -- สร้าง remote ตอน require เพื่อให้ client หาเจอเสมอ ไม่ขึ้นกับลำดับ Start
@@ -323,6 +324,7 @@ local function buildPad(folder: Folder, index: number): Pad
 		EndsAt = 0,
 		Generation = 0,
 		Label = label,
+		Part = part,
 	}
 	prompt.Triggered:Connect(function(player: Player)
 		onPadTriggered(pad, player)
@@ -365,6 +367,38 @@ local function onPlayerRemoving(player: Player)
 	end
 end
 
+-- server ตัดสินว่าผู้เล่นยังอยู่บนแท่นไหม: ต้องมีตัวละครที่ยังไม่ตาย และ HumanoidRootPart อยู่ในขอบเขตแท่น
+local function isOnPad(pad: Pad, player: Player): boolean
+	local character = player.Character
+	if character == nil then
+		return false
+	end
+	local humanoid = character:FindFirstChildOfClass("Humanoid")
+	local root = character:FindFirstChild("HumanoidRootPart")
+	if humanoid == nil or humanoid.Health <= 0 or root == nil or not root:IsA("BasePart") then
+		return false
+	end
+	local offset = pad.Part.CFrame:PointToObjectSpace(root.Position)
+	local halfSize = pad.Part.Size / 2
+	return math.abs(offset.X) <= halfSize.X + Lobby.PadExitMarginStuds
+		and math.abs(offset.Z) <= halfSize.Z + Lobby.PadExitMarginStuds
+		and offset.Y >= -halfSize.Y - Lobby.PadExitMarginStuds
+		and offset.Y <= halfSize.Y + Lobby.PadExitHeightStuds
+end
+
+local function checkPresence()
+	for _, pad in pads do
+		if pad.State == "Teleporting" then
+			continue
+		end
+		for _, member in table.clone(pad.Members) do
+			if padOf[member] == pad and not isOnPad(pad, member) then
+				leaveGroup(pad, member, true)
+			end
+		end
+	end
+end
+
 -- client บอกว่าพร้อมรับ state แล้ว (ไม่รับ argument ใด ๆ จาก client)
 local function onClientReady(player: Player)
 	if not limiter:Check(player, "LobbyReady") then
@@ -395,6 +429,12 @@ function LobbyService.Start()
 	readyEvent.OnServerEvent:Connect(onClientReady)
 	Players.PlayerRemoving:Connect(onPlayerRemoving)
 	TeleportService.TeleportInitFailed:Connect(onTeleportInitFailed)
+	task.spawn(function()
+		while true do
+			task.wait(Lobby.PresenceCheckSeconds)
+			checkPresence()
+		end
+	end)
 	if not Places.IsSet(Places.IslandPlaceId) then
 		warn(`{LOG} ยังไม่ได้ตั้ง IslandPlaceId ใน Config/Places ผู้เล่นจะ teleport ไม่ได้จนกว่าเจ้าของจะกรอก`)
 	end
