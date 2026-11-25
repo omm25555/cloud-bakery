@@ -123,7 +123,7 @@ function DayNightRules.Step(state: State, durations: Durations): State
 	local index = indexOf(state.Phase)
 	for offset = 1, count do
 		local nextIndex = (index - 1 + offset) % count + 1
-		local candidate = order[nextIndex]
+		local candidate: Phase = order[nextIndex]
 		if DayNightRules.DurationFor(candidate, durations) > 0 then
 			local wrapped = nextIndex <= index
 			local result: State = { Phase = candidate, Day = if wrapped then state.Day + 1 else state.Day }
