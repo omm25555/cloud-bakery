@@ -60,7 +60,7 @@ local function returnToLobby(player: Player)
 	NotifyService.Notify(player, "IslandDirectEntry", "info", nil)
 	task.spawn(function()
 		local ok, err = pcall(function()
-			TeleportService:Teleport(lobbyId, player)
+			TeleportService:TeleportAsync(lobbyId, { player })
 		end)
 		if not ok then
 			warn(`{LOG} พา {player.Name} กลับ lobby ไม่สำเร็จ: {tostring(err)}`)
@@ -88,7 +88,16 @@ local function onPlayerAdded(player: Player)
 	entries[player] = data
 end
 
+local function onTeleportInitFailed(player: Player, result: Enum.TeleportResult, message: string)
+	if mode ~= "Direct" or player.Parent ~= Players then
+		return
+	end
+	warn(`{LOG} TeleportInitFailed ของ {player.Name}: {result.Name} {message}`)
+	NotifyService.Notify(player, "LobbyTeleportFailed", "error", nil)
+end
+
 function RoundEntryService.Start()
+	TeleportService.TeleportInitFailed:Connect(onTeleportInitFailed)
 	Players.PlayerAdded:Connect(onPlayerAdded)
 	Players.PlayerRemoving:Connect(function(player: Player)
 		entries[player] = nil

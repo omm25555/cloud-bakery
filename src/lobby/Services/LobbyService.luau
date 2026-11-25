@@ -74,6 +74,7 @@ local function sendState(player: Player)
 		Members = names,
 		MaxSize = Lobby.MaxGroupSize,
 		SecondsLeft = if pad.State == "Counting" then secondsLeft(pad) else nil,
+		Teleporting = pad.State == "Teleporting",
 	})
 end
 
@@ -115,23 +116,6 @@ local function failTeleport(pad: Pad, key: string, reason: string)
 	resetPad(pad)
 end
 
-local function reserveServer(placeId: number): string?
-	local attempts = 1 + Lobby.ReserveRetries
-	for attempt = 1, attempts do
-		local ok, result = pcall(function(): string
-			return TeleportService:ReserveServer(placeId)
-		end)
-		if ok and type(result) == "string" and result ~= "" then
-			return result
-		end
-		warn(`{LOG} ReserveServer ล้มเหลว (ครั้งที่ {attempt}/{attempts}): {tostring(result)}`)
-		if attempt < attempts then
-			task.wait(Lobby.RetryDelaySeconds)
-		end
-	end
-	return nil
-end
-
 local function teleportGroup(pad: Pad)
 	pad.Generation += 1
 	local generation = pad.Generation
@@ -142,17 +126,7 @@ local function teleportGroup(pad: Pad)
 	local placeId = Places.IslandPlaceId
 	if not Places.IsSet(placeId) then
 		-- ไม่ retry: Place ID เป็น 0 จนกว่าเจ้าของจะกรอก
-		warn(`{LOG} ยังไม่ได้ตั้ง IslandPlaceId ใน Config/Places ยกเลิกการ teleport`)
-		failTeleport(pad, "LobbyPlaceNotSet", "IslandPlaceId ยังเป็น 0")
-		return
-	end
-
-	local accessCode = reserveServer(placeId)
-	if pad.Generation ~= generation or pad.State ~= "Teleporting" then
-		return
-	end
-	if accessCode == nil then
-		failTeleport(pad, "LobbyReserveFailed", "reserve server ไม่สำเร็จหลัง retry ครบ")
+		failTeleport(pad, "LobbyPlaceNotSet", "ยังไม่ได้ตั้ง IslandPlaceId ใน Config/Places ยกเลิกการ teleport")
 		return
 	end
 
@@ -169,16 +143,30 @@ local function teleportGroup(pad: Pad)
 		return
 	end
 
+	-- reserved server สร้างจาก GUID ที่เราสร้างเอง ทุกครั้งที่ retry ใช้ GUID เดิม
 	local options = Instance.new("TeleportOptions")
-	options.ReservedServerAccessCode = accessCode
+	options.ReservedServerId = HttpService:GenerateGUID(false)
 	options:SetTeleportData(LobbyRules.BuildTeleportData(HttpService:GenerateGUID(false), userIds))
 
-	local ok, err = pcall(function()
-		TeleportService:TeleportAsync(placeId, travelers, options)
-	end)
-	if not ok then
-		failTeleport(pad, "LobbyTeleportFailed", `TeleportAsync error: {tostring(err)}`)
-		return
+	local attempts = 1 + Lobby.TeleportRetries
+	local lastError = ""
+	for attempt = 1, attempts do
+		local ok, err = pcall(function()
+			TeleportService:TeleportAsync(placeId, travelers, options)
+		end)
+		if ok then
+			break
+		end
+		lastError = tostring(err)
+		warn(`{LOG} TeleportAsync ล้มเหลว (ครั้งที่ {attempt}/{attempts}): {lastError}`)
+		if attempt >= attempts then
+			failTeleport(pad, "LobbyReserveFailed", `TeleportAsync error หลัง retry ครบ: {lastError}`)
+			return
+		end
+		task.wait(Lobby.RetryDelaySeconds)
+		if pad.Generation ~= generation or pad.State ~= "Teleporting" then
+			return
+		end
 	end
 
 	-- ถ้าหลังรอแล้วยังมีคนค้างในกลุ่ม แปลว่า teleport ไม่เกิด ปล่อยให้ลองใหม่ได้
@@ -198,7 +186,8 @@ local function startCountdown(pad: Pad, seconds: number)
 	local generation = pad.Generation
 	pad.State = "Counting"
 	pad.EndsAt = os.clock() + seconds
-	notifyMembers(pad, "LobbyCountdownStarted", "info", { seconds = seconds })
+	local args: { [string]: string | number } = { seconds = seconds }
+	notifyMembers(pad, "LobbyCountdownStarted", "info", args)
 
 	task.spawn(function()
 		while pad.State == "Counting" and pad.Generation == generation and secondsLeft(pad) > 0 do
@@ -228,7 +217,8 @@ local function leaveGroup(pad: Pad, player: Player, voluntary: boolean)
 			cancelCountdown(pad)
 			notifyMembers(pad, "LobbyCountdownCancelled", "info", nil)
 		else
-			notifyMembers(pad, "LobbyMemberLeft", "info", { name = player.Name })
+			local args: { [string]: string | number } = { name = player.Name }
+			notifyMembers(pad, "LobbyMemberLeft", "info", args)
 		end
 	end
 	refreshPad(pad)
@@ -237,7 +227,8 @@ end
 local function joinGroup(pad: Pad, player: Player)
 	table.insert(pad.Members, player)
 	padOf[player] = pad
-	NotifyService.Notify(player, "LobbyJoinedGroup", "success", { count = #pad.Members, max = Lobby.MaxGroupSize })
+	local joinedArgs: { [string]: string | number } = { count = #pad.Members, max = Lobby.MaxGroupSize }
+	NotifyService.Notify(player, "LobbyJoinedGroup", "success", joinedArgs)
 
 	if not Places.IsSet(Places.IslandPlaceId) then
 		warn(`{LOG} {player.Name} เข้ากลุ่ม แต่ยังไม่ได้ตั้ง IslandPlaceId ใน Config/Places จะ teleport ไม่ได้`)
@@ -249,7 +240,8 @@ local function joinGroup(pad: Pad, player: Player)
 		startCountdown(pad, if full then Lobby.FullGroupCountdownSeconds else Lobby.CountdownSeconds)
 	elseif pad.State == "Counting" and full and secondsLeft(pad) > Lobby.FullGroupCountdownSeconds then
 		pad.EndsAt = os.clock() + Lobby.FullGroupCountdownSeconds
-		notifyMembers(pad, "LobbyCountdownStarted", "info", { seconds = Lobby.FullGroupCountdownSeconds })
+		local args: { [string]: string | number } = { seconds = Lobby.FullGroupCountdownSeconds }
+		notifyMembers(pad, "LobbyCountdownStarted", "info", args)
 	end
 	refreshPad(pad)
 end
@@ -269,7 +261,8 @@ local function onPadTriggered(pad: Pad, player: Player)
 		NotifyService.Notify(player, "LobbyTeleportBusy", "error", nil)
 	elseif decision == "Full" then
 		warn(`{LOG} {player.Name} เข้าแท่น {pad.Index} ไม่ได้ กลุ่มเต็ม`)
-		NotifyService.Notify(player, "LobbyGroupFull", "error", { max = Lobby.MaxGroupSize })
+		local args: { [string]: string | number } = { max = Lobby.MaxGroupSize }
+		NotifyService.Notify(player, "LobbyGroupFull", "error", args)
 	elseif decision == "Leave" then
 		leaveGroup(pad, player, true)
 	else
@@ -362,6 +355,7 @@ end
 local function onPlayerRemoving(player: Player)
 	local pad = padOf[player]
 	readyPlayers[player] = nil
+	limiter:Remove(player)
 	if pad then
 		leaveGroup(pad, player, false)
 	end

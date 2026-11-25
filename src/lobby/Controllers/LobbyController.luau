@@ -113,10 +113,14 @@ local function onState(payload: any)
 	end
 
 	local language = PlayerDataConfig.DefaultLanguage
-	title.Text = Strings.Format("UiLobbyGroupTitle", language, { count = #lines, max = maxSize })
+	local titleArgs: { [string]: string | number } = { count = #lines, max = maxSize }
+	title.Text = Strings.Format("UiLobbyGroupTitle", language, titleArgs)
 	members.Text = table.concat(lines, "\n")
-	if type(seconds) == "number" then
-		countdown.Text = Strings.Format("UiLobbyCountdown", language, { seconds = seconds })
+	if data.Teleporting == true then
+		countdown.Text = Strings.Format("LobbyTeleporting", language, nil)
+	elseif type(seconds) == "number" then
+		local countdownArgs: { [string]: string | number } = { seconds = seconds }
+		countdown.Text = Strings.Format("UiLobbyCountdown", language, countdownArgs)
 	else
 		countdown.Text = Strings.Format("UiLobbyWaiting", language, nil)
 	end

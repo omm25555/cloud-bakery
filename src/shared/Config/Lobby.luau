@@ -9,8 +9,8 @@ return {
 	FullGroupCountdownSeconds = 5,
 	TickSeconds = 1,
 
-	-- reserve server / teleport
-	ReserveRetries = 2,
+	-- teleport
+	TeleportRetries = 2,
 	RetryDelaySeconds = 2,
 	TeleportSettleSeconds = 10,
 	TeleportDataVersion = 1,
