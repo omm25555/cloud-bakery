@@ -802,6 +802,78 @@ local Messages: { [string]: Entry } = {
 		th = "ปฏิเสธ",
 		en = "Decline",
 	},
+	LobbyPlaceNotSet = {
+		th = "ยังไม่ได้ตั้ง Place ID ของเกม (แจ้งเจ้าของเกมให้กรอกใน Config/Places) จึงยังเทเลพอร์ตไม่ได้",
+		en = "The game's Place ID has not been set yet (the owner must fill in Config/Places), so teleporting is unavailable.",
+	},
+	LobbyJoinedGroup = {
+		th = "เข้ากลุ่มแล้ว ({count}/{max})",
+		en = "Joined the group ({count}/{max}).",
+	},
+	LobbyLeftGroup = {
+		th = "ออกจากกลุ่มแล้ว",
+		en = "You left the group.",
+	},
+	LobbyGroupFull = {
+		th = "กลุ่มเต็มแล้ว (สูงสุด {max} คน) ลองแท่นอื่น",
+		en = "This group is full (max {max}). Try another pad.",
+	},
+	LobbyCountdownStarted = {
+		th = "เริ่มนับถอยหลัง ออกเดินทางใน {seconds} วินาที",
+		en = "Countdown started. Departing in {seconds} seconds.",
+	},
+	LobbyCountdownCancelled = {
+		th = "ยกเลิกการนับถอยหลังเพราะผู้เล่นไม่พอ",
+		en = "Countdown cancelled: not enough players.",
+	},
+	LobbyMemberLeft = {
+		th = "{name} ออกจากกลุ่มแล้ว",
+		en = "{name} left the group.",
+	},
+	LobbyTeleporting = {
+		th = "กำลังพาไปเกาะ...",
+		en = "Teleporting to the island...",
+	},
+	LobbyReserveFailed = {
+		th = "จองเซิร์ฟเวอร์ไม่สำเร็จ กรุณากดที่แท่นเพื่อเข้ากลุ่มแล้วลองใหม่",
+		en = "Couldn't reserve a server. Step on a pad to join a group and try again.",
+	},
+	LobbyTeleportFailed = {
+		th = "เทเลพอร์ตไม่สำเร็จ กรุณากดที่แท่นเพื่อเข้ากลุ่มแล้วลองใหม่",
+		en = "Teleport failed. Step on a pad to join a group and try again.",
+	},
+	LobbyTeleportBusy = {
+		th = "กลุ่มนี้กำลังเตรียมเดินทาง กรุณารอสักครู่",
+		en = "This group is preparing to depart. Please wait a moment.",
+	},
+	IslandBadEntry = {
+		th = "ข้อมูลการเข้าเกาะไม่ถูกต้อง คุณยังเล่นต่อได้ตามปกติ",
+		en = "Invalid island entry data. You can keep playing as normal.",
+	},
+	IslandDirectEntry = {
+		th = "เกาะนี้ต้องเข้าผ่านล็อบบี้ กำลังพากลับล็อบบี้...",
+		en = "This island must be entered through the lobby. Returning you to the lobby...",
+	},
+	UiLobbyPadAction = {
+		th = "เข้า/ออกกลุ่ม",
+		en = "Join/leave group",
+	},
+	UiLobbyPadObject = {
+		th = "แท่นเดินทางไปเกาะ",
+		en = "Island travel pad",
+	},
+	UiLobbyGroupTitle = {
+		th = "กลุ่มของคุณ ({count}/{max})",
+		en = "Your group ({count}/{max})",
+	},
+	UiLobbyCountdown = {
+		th = "ออกเดินทางใน {seconds} วินาที",
+		en = "Departing in {seconds}s",
+	},
+	UiLobbyWaiting = {
+		th = "รอผู้เล่นเพิ่ม",
+		en = "Waiting for players",
+	},
 }
 
 local Strings = {}

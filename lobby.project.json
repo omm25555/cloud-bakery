@@ -1,0 +1,45 @@
+{
+  "name": "CloudBakeryLobby",
+  "tree": {
+    "$className": "DataModel",
+    "ServerScriptService": {
+      "$className": "ServerScriptService",
+      "Lobby": {
+        "$path": "src/lobby/server",
+        "Services": {
+          "$className": "Folder",
+          "LobbyService": {
+            "$path": "src/lobby/Services/LobbyService.luau"
+          },
+          "NotifyService": {
+            "$path": "src/server/Services/NotifyService.luau"
+          }
+        }
+      }
+    },
+    "ReplicatedStorage": {
+      "$className": "ReplicatedStorage",
+      "Shared": {
+        "$path": "src/shared"
+      }
+    },
+    "StarterPlayer": {
+      "$className": "StarterPlayer",
+      "StarterPlayerScripts": {
+        "$className": "StarterPlayerScripts",
+        "Client": {
+          "$path": "src/lobby/client",
+          "Controllers": {
+            "$className": "Folder",
+            "LobbyController": {
+              "$path": "src/lobby/Controllers/LobbyController.luau"
+            },
+            "NotifyController": {
+              "$path": "src/client/Controllers/NotifyController.luau"
+            }
+          }
+        }
+      }
+    }
+  }
+}

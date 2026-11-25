@@ -37,6 +37,8 @@ local Config: RateLimitsConfig = {
 		QuestClaim = { Capacity = 3, RefillPerSecond = 1 },
 		CoopOffer = { Capacity = 3, RefillPerSecond = 1 },
 		CoopRespond = { Capacity = 4, RefillPerSecond = 2 },
+		LobbyPrompt = { Capacity = 3, RefillPerSecond = 1 },
+		LobbyReady = { Capacity = 2, RefillPerSecond = 0.2 },
 	},
 	WarnCooldownSeconds = 5,
 	NotifyCooldownSeconds = 5,
