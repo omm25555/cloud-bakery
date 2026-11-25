@@ -934,6 +934,122 @@ local Messages: { [string]: Entry } = {
 		th = "[ทดสอบ] anomaly {id} ใช้ไม่ได้: {reason}",
 		en = "[Test] anomaly {id} is unusable: {reason}",
 	},
+	ReportMenuTitle = {
+		th = "รายงานผู้จัดการ",
+		en = "Report to Manager",
+	},
+	ReportCategory_customer = {
+		th = "ลูกค้า",
+		en = "Customers",
+	},
+	ReportCategory_oven = {
+		th = "เตาอบ",
+		en = "Oven",
+	},
+	ReportCategory_farm = {
+		th = "ฟาร์ม",
+		en = "Farm",
+	},
+	ReportCategory_shop = {
+		th = "ของในร้าน",
+		en = "Shop items",
+	},
+	ReportCategory_sky = {
+		th = "ท้องฟ้า/แสง",
+		en = "Sky & light",
+	},
+	ReportCategory_sound = {
+		th = "เสียง",
+		en = "Sounds",
+	},
+	ReportCustomerPickTitle = {
+		th = "ลูกค้าคนไหนดูแปลกๆ?",
+		en = "Which customer looks odd?",
+	},
+	ReportNoCustomers = {
+		th = "ตอนนี้ไม่มีลูกค้าในร้านให้เลือก",
+		en = "There are no customers in the shop right now.",
+	},
+	ReportBack = {
+		th = "กลับ",
+		en = "Back",
+	},
+	ReportClose = {
+		th = "ปิด",
+		en = "Close",
+	},
+	ReportPromptAction = {
+		th = "รายงาน",
+		en = "Report",
+	},
+	ReportPromptObject = {
+		th = "ผู้จัดการร้าน",
+		en = "Shop Manager",
+	},
+	ReportCorrect = {
+		th = "รายงานถูกต้อง! ผู้จัดการให้เหรียญ {coins}",
+		en = "Correct report! The manager gave you {coins} coins.",
+	},
+	ReportCorrectByOther = {
+		th = "{player} รายงานสิ่งผิดปกติได้ถูกต้อง!",
+		en = "{player} made a correct report!",
+	},
+	ReportWrong = {
+		th = "ผิดแล้ว ไม่มีอะไรผิดปกติในหมวดนี้ สติลดลง {lost} (เหลือ {sanity})",
+		en = "Wrong! Nothing odd in that category. Sanity -{lost} ({sanity} left).",
+	},
+	ReportWrongNone = {
+		th = "ตอนนี้ไม่มีอะไรผิดปกติให้รายงาน สติลดลง {lost} (เหลือ {sanity})",
+		en = "Nothing odd to report right now. Sanity -{lost} ({sanity} left).",
+	},
+	ReportRateLimited = {
+		th = "กดรายงานถี่เกินไป รอสักครู่ก่อนนะ",
+		en = "You are reporting too fast. Please wait a moment.",
+	},
+	ReportTooFar = {
+		th = "อยู่ไกลผู้จัดการเกินไป เดินเข้าไปใกล้ๆ ก่อนนะ",
+		en = "You are too far from the manager. Walk closer.",
+	},
+	ReportNotNight = {
+		th = "รายงานผู้จัดการได้เฉพาะตอนกลางคืนเท่านั้น",
+		en = "You can only report to the manager at night.",
+	},
+	ReportInvalid = {
+		th = "คำขอรายงานไม่ถูกต้อง ลองเปิดเมนูใหม่อีกครั้ง",
+		en = "Invalid report. Please open the menu again.",
+	},
+	ReportCooldown = {
+		th = "รอสักครู่ก่อนรายงานอีกครั้งนะ",
+		en = "Please wait a moment before reporting again.",
+	},
+	ReportMenuExpired = {
+		th = "เมนูรายงานปิดไปแล้ว คุยกับผู้จัดการใหม่อีกครั้งนะ",
+		en = "The report menu closed. Talk to the manager again.",
+	},
+	SanityLabel = {
+		th = "สติ {sanity}/{max}",
+		en = "Sanity {sanity}/{max}",
+	},
+	SanityDepleted = {
+		th = "สติของคุณหมดแล้ว! ระวังตัวนะ",
+		en = "Your sanity ran out! Be careful.",
+	},
+	SanityLostMissed = {
+		th = "มีบางอย่างผิดปกติที่ไม่ได้ถูกรายงาน สติลดลง {lost}",
+		en = "Something odd went unreported. Sanity -{lost}.",
+	},
+	NightServedAll = {
+		th = "บริการครบแล้ว! อีก {seconds} วินาทีจะเช้า",
+		en = "All customers served! Morning in {seconds} seconds.",
+	},
+	NightEndingCountdown = {
+		th = "เช้าในอีก {seconds} วินาที",
+		en = "Morning in {seconds}s",
+	},
+	NightLeftover = {
+		th = "หมดเวลาแล้ว ยังเหลือลูกค้า {count} คน สติลดลง {lost}",
+		en = "Time is up with {count} customer(s) left. Sanity -{lost}.",
+	},
 }
 
 local Strings = {}
