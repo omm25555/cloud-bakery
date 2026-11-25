@@ -40,3 +40,14 @@
 - สัญญาณฝั่ง server (ฟังก์ชันที่มี type คืน `RBXScriptConnection`): `OnPhaseChanged(callback: (phase, dayNumber) -> ())`, `OnNightStarted(callback: (nightNumber) -> ())` ตอนเริ่ม Night, `OnMorningStarted(callback: (dayNumber) -> ())` ตอนเริ่ม Day หลัง Dawn (วันที่ 1 ตอนเริ่มรอบยิงเฉพาะ `OnPhaseChanged`)
 - `GetNightNumber()` = คืนของ "วันนี้" ตอน Day วันที่ N คืน N ยังไม่เกิด ใช้ `IsNight()` เช็คว่าอยู่ในคืนหรือไม่
 - client (`DayNightController`) แสดงกล่อง phase/วัน-คืน/เวลาที่เหลือกลางบนจอ และปรับ Lighting/Atmosphere (ถ้ามี Atmosphere อยู่แล้วใน Lighting จะถูกเขียนทับค่า)
+
+## Anomaly framework (TASK-013)
+- ทุกคืน (`DayNightService.OnNightStarted`) `AnomalyService` สุ่มชนิดคืน `Normal`/`Anomaly` จาก `Config/Anomalies.Modes[โหมด].NightTypeWeights` (โหมดอ่านจาก `DayNightService.GetMode()`) คืนที่ 1..`GuaranteedNormalNights` (ตอนนี้ 1) เป็นคืนปกติเสมอ
+- คืน anomaly: กรอง entry ที่ valid และ `Subtlety <= MaxSubtlety` ของโหมด สุ่มตาม `Weight` ไม่ซ้ำ จำนวน `AnomaliesMin..Max` เกิดในช่วง `SpawnWindow` (สัดส่วนของเวลาคืน) เวลานับเฉพาะตอน DayNight กำลังนับ ไม่มี anomaly ที่ใช้ได้เลย = ถือเป็นคืนปกติ + `warn`
+- ล้างทุกอย่างตอน `OnMorningStarted` (`Revert` + ลบของใน Workspace `AnomalyProps`) และ log จำนวนที่ล้าง/ของค้าง
+- Subtlety สเกล 1-5 (1 = เห็นชัด) Category: `customer`, `oven`, `farm`, `shop`, `sky`, `sound` anomaly ทดสอบ: `ColorShift`, `Relocate` (หมวด `shop` เฉพาะ `Workspace.ServeStations`)
+- เพิ่ม anomaly ใหม่ = เพิ่ม Entry ใน `Config/Anomalies` + `src/server/Anomalies/<Id>.luau` (`Spawn(context)` คืน `Handle`) ไม่ต้องแก้ `AnomalyService` ไม่มี remote client ไม่รู้ว่ามี anomaly
+- API ฝั่ง server: `GetNightType`, `GetActiveAnomalies`, `ResolveAnomaly(instanceId)`, `GetCategories`, `HasActiveOfCategory(category, customerId?)`, `GetActiveOfCategory`, `GetNightRoster`, `MarkCustomerHandled(slotId, "Served" | "Reported")` สัญญาณ: `OnNightType`, `OnAnomalySpawned`, `OnAnomalyResolved(anomaly, byPlayer)`, `OnRosterComplete`, `OnNightEnded(night, missed)`
+- โควตาลูกค้ากลางคืน (roster ตัวนับใน `AnomalyService` ยังไม่ผูกลูกค้าจริง): สุ่ม `BaseMin..BaseMax` เพิ่ม `GrowthAmount` ทุก `GrowthEveryNights` คืน clamp `HardMin..HardMax` (1..5) `Pending == 0` ยิง `OnRosterComplete` ครั้งเดียว ตอน Dawn slot ที่ค้างเป็น `Missed` แล้วยิง `OnNightEnded`
+- `DayNightService.RequestEndNight(countdownSeconds)` ย่อเวลาที่เหลือของคืน (ไม่ยืดคืน เหลือน้อยกว่า countdown อยู่แล้ว = ไม่ทำอะไร คืน `true`) ตรวจค่าด้วย `DayNightRules.ClampEndCountdown`
+- เครื่องมือ Studio (เฉพาะ `RunService:IsStudio()`) attribute บน `ServerStorage`: `AnomalyForceNight` (`Anomaly`/`Normal`), `AnomalyForceIds` (เช่น `ColorShift,Relocate` เกิดทันที), `AnomalyDebugHandle` (จำนวนลูกค้าที่ให้ถือว่าเสิร์ฟแล้ว)

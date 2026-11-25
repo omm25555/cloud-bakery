@@ -922,6 +922,18 @@ local Messages: { [string]: Entry } = {
 		th = "คืนที่ {day}",
 		en = "Night {day}",
 	},
+	AnomalyNameColorShift = {
+		th = "ของในร้านเปลี่ยนสี",
+		en = "Shop item changed color",
+	},
+	AnomalyNameRelocate = {
+		th = "ที่นั่งขยับผิดที่",
+		en = "Seat moved out of place",
+	},
+	AnomalyConfigInvalid = {
+		th = "[ทดสอบ] anomaly {id} ใช้ไม่ได้: {reason}",
+		en = "[Test] anomaly {id} is unusable: {reason}",
+	},
 }
 
 local Strings = {}
