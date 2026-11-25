@@ -49,6 +49,8 @@ local Fallback: Durations = {
 	WarningSeconds = 30,
 }
 
+local PhaseOrder: { Phase } = { "Day", "Dusk", "Night", "Dawn" }
+
 local DayLook: Look = {
 	ClockTime = 14,
 	Brightness = 3,
@@ -87,7 +89,7 @@ return {
 	AttributeMode = "DayNightMode",
 
 	-- ลำดับ phase ในหนึ่งรอบ และรายชื่อช่องที่ต้องตรวจ
-	PhaseOrder = { "Day", "Dusk", "Night", "Dawn" } :: { Phase },
+	PhaseOrder = PhaseOrder,
 	DurationFields = { "DaySeconds", "DuskSeconds", "NightSeconds", "DawnSeconds", "WarningSeconds" } :: { string },
 	-- ช่องที่ตั้งเป็น 0 ได้ (ช่วงเปลี่ยนถูกข้าม / ปิดการเตือน) ช่องอื่นต้อง > 0
 	ZeroAllowed = { DuskSeconds = true, DawnSeconds = true, WarningSeconds = true } :: { [string]: boolean },

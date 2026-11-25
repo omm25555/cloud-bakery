@@ -101,7 +101,8 @@ local function schedule()
 			warnThread = task.delay(untilWarning, function()
 				warnThread = nil
 				warned = true
-				broadcast("DayNightDuskWarning", "info", { seconds = math.round(durations.WarningSeconds) })
+				local warningArgs: { [string]: string | number } = { seconds = math.round(durations.WarningSeconds) }
+				broadcast("DayNightDuskWarning", "info", warningArgs)
 			end)
 		end
 	end
@@ -122,10 +123,12 @@ local function enterPhase(nextState: DayNightRules.State, announce: boolean)
 		return
 	end
 	if phase == "Night" then
-		broadcast("DayNightNightStarted", "info", { night = day })
+		local nightArgs: { [string]: string | number } = { night = day }
+		broadcast("DayNightNightStarted", "info", nightArgs)
 		nightStarted:Fire(day)
 	elseif phase == "Day" and previousPhase ~= "Day" then
-		broadcast("DayNightMorningStarted", "success", { day = day })
+		local morningArgs: { [string]: string | number } = { day = day }
+		broadcast("DayNightMorningStarted", "success", morningArgs)
 		morningStarted:Fire(day)
 	end
 end
@@ -143,20 +146,6 @@ local function pause()
 	running = false
 	cancelThreads()
 	publish()
-end
-
-local function resume()
-	if running then
-		return
-	end
-	running = true
-	if not started then
-		started = true
-		loadConfig()
-		enterPhase({ Phase = "Day", Day = day }, false)
-		return
-	end
-	schedule()
 end
 
 -- เลือกโหมดและตรวจค่า config ของโหมดนั้น (เรียกครั้งเดียวตอนเริ่มรอบ)
@@ -181,16 +170,31 @@ local function loadConfig()
 	end
 end
 
+local function resume()
+	if running then
+		return
+	end
+	running = true
+	if not started then
+		started = true
+		loadConfig()
+		enterPhase({ Phase = "Day", Day = day }, false)
+		return
+	end
+	schedule()
+end
+
 local function notifyConfigProblems(player: Player)
 	if not RunService:IsStudio() then
 		return
 	end
 	for _, problem in configProblems do
-		NotifyService.Notify(player, "DayNightConfigInvalid", "error", {
+		local args: { [string]: string | number } = {
 			field = problem.Field,
 			value = string.sub(problem.Value, 1, NotifyConfig.MaxArgLength),
 			used = problem.Used,
-		})
+		}
+		NotifyService.Notify(player, "DayNightConfigInvalid", "error", args)
 	end
 end
 

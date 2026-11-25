@@ -118,7 +118,7 @@ end
 
 -- phase ถัดไป ข้ามช่วงที่ยาว 0 วินาที เลขวันเพิ่มเมื่อวนกลับมาเริ่ม Day
 function DayNightRules.Step(state: State, durations: Durations): State
-	local order = DayNight.PhaseOrder
+	local order: { Phase } = DayNight.PhaseOrder
 	local count = #order
 	local index = indexOf(state.Phase)
 	for offset = 1, count do
@@ -126,7 +126,8 @@ function DayNightRules.Step(state: State, durations: Durations): State
 		local candidate = order[nextIndex]
 		if DayNightRules.DurationFor(candidate, durations) > 0 then
 			local wrapped = nextIndex <= index
-			return { Phase = candidate, Day = if wrapped then state.Day + 1 else state.Day }
+			local result: State = { Phase = candidate, Day = if wrapped then state.Day + 1 else state.Day }
+			return result
 		end
 	end
 	return state

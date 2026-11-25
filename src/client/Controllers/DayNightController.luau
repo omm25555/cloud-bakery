@@ -161,7 +161,8 @@ local function refreshUi(view: View?)
 	local counterKey = if view.Phase == "Day" then "DayNightCounterDay" else "DayNightCounterNight"
 	ui.Title.Text = Strings.Format(LABEL_KEYS[view.Phase], language, nil)
 	ui.Title.TextColor3 = if isDayLike then DayNight.DayAccentColor else DayNight.NightAccentColor
-	ui.Counter.Text = Strings.Format(counterKey, language, { day = view.Day })
+	local counterArgs: { [string]: number | string } = { day = view.Day }
+	ui.Counter.Text = Strings.Format(counterKey, language, counterArgs)
 	local remaining = DayNightRules.Remaining(endsAt, Workspace:GetServerTimeNow())
 	ui.Time.Text = DayNightRules.FormatClock(remaining)
 end
