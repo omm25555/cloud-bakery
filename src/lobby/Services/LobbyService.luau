@@ -130,27 +130,31 @@ local function teleportGroup(pad: Pad)
 		return
 	end
 
-	local travelers: { Player } = {}
-	local userIds: { number } = {}
-	for _, member in pad.Members do
-		if member.Parent == Players then
-			table.insert(travelers, member)
-			table.insert(userIds, member.UserId)
-		end
-	end
-	if #travelers == 0 then
-		resetPad(pad)
-		return
-	end
-
-	-- reserved server สร้างจาก GUID ที่เราสร้างเอง ทุกครั้งที่ retry ใช้ GUID เดิม
-	local options = Instance.new("TeleportOptions")
-	options.ReservedServerId = HttpService:GenerateGUID(false)
-	options:SetTeleportData(LobbyRules.BuildTeleportData(HttpService:GenerateGUID(false), userIds))
+	-- reserved server และ GroupId สร้างครั้งเดียว ทุกครั้งที่ retry ใช้ค่าเดิม
+	local reservedServerId = HttpService:GenerateGUID(false)
+	local groupId = HttpService:GenerateGUID(false)
 
 	local attempts = 1 + Lobby.TeleportRetries
 	local lastError = ""
 	for attempt = 1, attempts do
+		-- สร้างรายชื่อใหม่ทุกครั้ง เพราะอาจมีคนออกเกมระหว่างรอ retry
+		local travelers: { Player } = {}
+		local userIds: { number } = {}
+		for _, member in pad.Members do
+			if member.Parent == Players then
+				table.insert(travelers, member)
+				table.insert(userIds, member.UserId)
+			end
+		end
+		if #travelers == 0 then
+			resetPad(pad)
+			return
+		end
+
+		local options = Instance.new("TeleportOptions")
+		options.ReservedServerId = reservedServerId
+		options:SetTeleportData(LobbyRules.BuildTeleportData(groupId, userIds))
+
 		local ok, err = pcall(function()
 			TeleportService:TeleportAsync(placeId, travelers, options)
 		end)
