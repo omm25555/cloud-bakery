@@ -146,6 +146,14 @@ function DayNightRules.Remaining(endsAt: number, now: number): number
 	return math.max(0, endsAt - now)
 end
 
+-- ตรวจเวลานับถอยหลังจบคืน (ตัวเลขจำกัดและ > 0) คืนค่าที่ไม่เกินเวลาที่เหลือ ผิด = nil
+function DayNightRules.ClampEndCountdown(requested: unknown, remaining: number): number?
+	if not isFiniteNumber(requested) or (requested :: number) <= 0 then
+		return nil
+	end
+	return math.min(requested :: number, remaining)
+end
+
 -- สัดส่วนที่ผ่านไปของ phase (0..1)
 function DayNightRules.Fraction(remaining: number, phaseSeconds: number): number
 	if phaseSeconds <= 0 then

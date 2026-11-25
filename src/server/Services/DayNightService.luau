@@ -290,6 +290,25 @@ function DayNightService.GetTimeRemaining(): number
 	return remaining
 end
 
+-- ย่อเวลาที่เหลือของคืนเหลือ countdownSeconds (ไม่ยืดคืน ถ้าเหลือน้อยกว่าอยู่แล้วไม่ทำอะไร) ใช้ตอนจัดการลูกค้าครบ
+function DayNightService.RequestEndNight(countdownSeconds: number): boolean
+	if phase ~= "Night" or not running then
+		warn(`{LOG} RequestEndNight ถูกปฏิเสธ: ไม่ได้อยู่ในคืนที่กำลังนับเวลา (phase {phase}, running {tostring(running)})`)
+		return false
+	end
+	local current = DayNightRules.Remaining(endsAt, Workspace:GetServerTimeNow())
+	local target = DayNightRules.ClampEndCountdown(countdownSeconds, current)
+	if target == nil then
+		warn(`{LOG} RequestEndNight ถูกปฏิเสธ: countdown ต้องเป็นตัวเลขมากกว่า 0 (ค่า {tostring(countdownSeconds)})`)
+		return false
+	end
+	if target < current then
+		remaining = target
+		schedule()
+	end
+	return true
+end
+
 function DayNightService.Start()
 	Players.PlayerAdded:Connect(onPlayerAdded)
 	Players.PlayerRemoving:Connect(onPlayerRemoving)
