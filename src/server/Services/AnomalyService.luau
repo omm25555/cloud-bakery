@@ -227,7 +227,9 @@ local function rollback(changes: { () -> () }, tracked: { Instance }): number
 	local failed = 0
 	for index = #changes, 1, -1 do
 		local undo = changes[index]
-		local ok, err = pcall(undo)
+		local ok, err = pcall(function()
+			undo()
+		end)
 		if not ok then
 			failed += 1
 			warn(`{LOG} คืนค่าเดิมไม่สำเร็จ: {tostring(err)}`)
@@ -250,7 +252,9 @@ local function revertRecord(record: Record): boolean
 	local failed = 0
 	local revert = record.Handle.Revert
 	if revert ~= nil then
-		local ok, err = pcall(revert)
+		local ok, err = pcall(function()
+			revert()
+		end)
 		if not ok then
 			failed += 1
 			warn(`{LOG} {record.Info.Id}: Revert ของโมดูลล้มเหลว {tostring(err)} (ใช้การคืนค่าสำรองต่อ)`)
@@ -339,7 +343,9 @@ local function cancelSpawnThread()
 end
 
 local function safeSpawn(entry: Anomalies.Entry)
-	local ok, err = pcall(spawnAnomaly, entry)
+	local ok, err = pcall(function()
+		spawnAnomaly(entry)
+	end)
 	if not ok then
 		warn(`{LOG} anomaly {entry.Id} ข้าม: error ที่ไม่คาดคิด {tostring(err)}`)
 	end
@@ -568,7 +574,9 @@ local function finishNight()
 end
 
 local function guarded(label: string, fn: () -> ())
-	local ok, err = pcall(fn)
+	local ok, err = pcall(function()
+		fn()
+	end)
 	if not ok then
 		warn(`{LOG} {label} error (ระบบวัน/คืนและร้านเล่นต่อได้): {tostring(err)}`)
 	end

@@ -56,6 +56,15 @@ local function contains(list: { string }, value: string): boolean
 	return false
 end
 
+local function containsNightType(list: { Anomalies.NightType }, value: string): boolean
+	for _, item in list do
+		if item == value then
+			return true
+		end
+	end
+	return false
+end
+
 function AnomalyRules.EntryToMap(entry: Anomalies.Entry): { [string]: unknown }
 	return {
 		Id = entry.Id,
@@ -115,10 +124,10 @@ function AnomalyRules.ValidateEntry(
 end
 
 -- ตรวจค่าโหมด คืนเหตุผลที่ผิด (nil = ผ่าน)
-function AnomalyRules.ValidateMode(settings: Anomalies.ModeSettings, nightTypes: { string }): string?
+function AnomalyRules.ValidateMode(settings: Anomalies.ModeSettings, nightTypes: { Anomalies.NightType }): string?
 	local total = 0
 	for name, weight in settings.NightTypeWeights do
-		if not contains(nightTypes, name) then
+		if not containsNightType(nightTypes, name) then
 			return `NightTypeWeights มีชนิดคืนที่ไม่รู้จัก ({name})`
 		end
 		if not isFiniteNumber(weight) or weight < 0 then
@@ -207,8 +216,12 @@ function AnomalyRules.PickIndex<T>(items: { T }, weightOf: (item: T) -> number, 
 end
 
 -- สุ่มชนิดคืนจากตาราง weight (เรียงตาม nightTypes เพื่อให้ผลคงที่เมื่อ roll เท่าเดิม)
-function AnomalyRules.PickNightType(weights: { [string]: number }, nightTypes: { string }, roll: number): string?
-	local index = AnomalyRules.PickIndex(nightTypes, function(name: string): number
+function AnomalyRules.PickNightType(
+	weights: { [string]: number },
+	nightTypes: { Anomalies.NightType },
+	roll: number
+): Anomalies.NightType?
+	local index = AnomalyRules.PickIndex(nightTypes, function(name: Anomalies.NightType): number
 		return weights[name] or 0
 	end, roll)
 	if index == nil then
